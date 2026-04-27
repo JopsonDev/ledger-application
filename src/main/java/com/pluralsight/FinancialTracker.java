@@ -229,6 +229,7 @@ public class FinancialTracker {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(fileName));
             String line;
+            boolean oneTime = false;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split("\\|");
                 LocalDate date = LocalDate.parse(parts[0]);
@@ -241,6 +242,7 @@ public class FinancialTracker {
                 int timeLength = parts[1].length();
                 int descriptionLength = parts[2].length();
                 int vendorLength = parts[3].length();
+                int totalLength = 0;
 
                 for (Transaction t : transactions){
                     dateLength = Math.max(dateLength, t.getDate().toString().length());
@@ -249,6 +251,14 @@ public class FinancialTracker {
                     vendorLength = Math.max(vendorLength, t.getVendor().length());
                 }
 
+                while(!oneTime) {
+                    totalLength = dateLength + timeLength + descriptionLength + vendorLength + 10 + 8; // 10 = number of columns 8 number of spaces
+
+
+                    System.out.printf("%-" + dateLength + "s %-" + timeLength + "s %-" + descriptionLength + "s %-" + vendorLength + "s %10s%n", "Date", "Time", "Description", "Vendor", "Amount");
+                    System.out.println("=".repeat(totalLength));
+                    oneTime = true;
+                }
                 System.out.printf("%-" + dateLength + "s %-" + timeLength + "s %-" + descriptionLength + "s %-" + vendorLength + "s %10s%n", date, time, description, vendor, amount);
             }
         } catch (Exception d){
