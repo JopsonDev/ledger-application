@@ -1,13 +1,16 @@
 package com.pluralsight;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 public class Transaction {
-    private String date;
-    private String time;
+    private LocalDate date;
+    private LocalTime time;
     private String description;
     private String vendor;
     private double price;
 
-    public Transaction(String date, String time, String description, String vendor, double price) {
+    public Transaction(LocalDate date, LocalTime time, String description, String vendor, double price) {
         this.date = date;
         this.time = time;
         this.description = description;
@@ -15,16 +18,16 @@ public class Transaction {
         this.price = price;
     }
 
-    public void setDate(String date) {this.date = date;}
+    public void setDate(LocalDate date) {this.date = date;}
     public void setDescription(String description) {this.description = description;}
     public void setPrice(double price) {this.price = price;}
-    public void setTime(String time) {this.time = time;}
+    public void setTime(LocalTime time) {this.time = time;}
     public void setVendor(String vendor) {this.vendor = vendor;}
 
-    public String getDate() {return date;}
+    public LocalDate getDate() {return date;}
     public String getDescription() {return description;}
     public double getPrice() {return price;}
-    public String getTime() {return time;}
+    public LocalTime getTime() {return time;}
     public String getVendor() {return vendor;}
 
     @Override

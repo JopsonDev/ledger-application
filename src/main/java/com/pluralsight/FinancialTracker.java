@@ -1,9 +1,13 @@
 package com.pluralsight;
 
 import java.io.*;
+import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Scanner;
 
 /*
@@ -78,14 +82,15 @@ public class FinancialTracker {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split("\\|");
-                String date = parts[0];
-                String time = parts[1];
+                LocalDate date = LocalDate.parse(parts[0]);
+                LocalTime time = LocalTime.parse(parts[1]);
                 String description = parts[2];
                 String vendor = parts[3];
                 double price = Double.parseDouble(parts[4]);
 
                 Transaction object = new Transaction(date, time, description, vendor, price);
                 transactions.add(object);
+                System.out.println(transactions);
 
             }
         } catch (Exception a) {
@@ -105,6 +110,42 @@ public class FinancialTracker {
      */
     private static void addDeposit(Scanner scanner) {
         // TODO
+        LocalDate date;
+        LocalTime time;
+        while (true) {
+            try {
+                System.out.print("Date and Time (yyyy-MM-dd HH:mm:ss): ");
+                String input = scanner.nextLine();
+                LocalDateTime dateTime = LocalDateTime.parse(input, DATETIME_FMT);
+                date = dateTime.toLocalDate();
+                time = dateTime.toLocalTime();
+                break;
+            } catch (Exception b) {
+                System.out.println("Invalid Date input Use yyyy-MM-dd HH:mm:ss)");
+            }
+        }
+        System.out.print("Description: ");
+        String description = scanner.nextLine();
+        System.out.print("Vendor: ");
+        String vendor = scanner.nextLine();
+        double amount;
+        while (true) {
+            System.out.println("Deposit: ");
+            amount = scanner.nextDouble();
+            scanner.nextLine();
+            if (amount > 0) { break;
+            } else {
+                System.out.println("Deposit needs to be a positive number.");
+            }
+        }
+        Transaction newDeposit = new Transaction(date, time, description, vendor, amount);
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter("Test.csv", true));
+            writer.write(String.valueOf(newDeposit));
+            writer.close();
+        }catch (Exception c){
+            System.out.println("failed to write");
+        }
     }
 
     /**
