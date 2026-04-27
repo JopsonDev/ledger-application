@@ -316,7 +316,7 @@ public class FinancialTracker {
                         }
                     }
                     if (!hasSomething){
-                        System.out.println("No transactions this year");
+                        System.out.println("No transactions last month");
                     }
                 }
                 case "3" -> {
@@ -346,7 +346,7 @@ public class FinancialTracker {
                         }
                     }
                     if (!hasSomething){
-                        System.out.println("No transactions last year");
+                        System.out.println("No transactions this year");
                     }
                 }
                 case "5" -> {
