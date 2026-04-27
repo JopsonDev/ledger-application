@@ -90,8 +90,6 @@ public class FinancialTracker {
 
                 Transaction object = new Transaction(date, time, description, vendor, amount);
                 transactions.add(object);
-                System.out.println(transactions);
-
             }
         } catch (Exception a) {
             System.out.println("Error 1: couldn't load transactions.");
@@ -232,31 +230,39 @@ public class FinancialTracker {
             vendorLength = Math.max(vendorLength, t.getVendor().length());
         }
         int totalLength = dateLength + timeLength + descriptionLength + vendorLength + 11 + 8; // 11 = amount column width, 8 = spaces between columns
-        System.out.printf("%-" + dateLength + "s %-" + timeLength + "s %-" + descriptionLength + "s %-" + vendorLength + "s %10s%n", "Date", "Time", "Description", "Vendor", "Amount");
-        System.out.println("=".repeat(totalLength));
-        return new ColumnWidth(dateLength,timeLength,descriptionLength,vendorLength);
+        return new ColumnWidth(dateLength,timeLength,descriptionLength,vendorLength,totalLength);
+    }
+    private static void columnSetUp(ColumnWidth width){
+        System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10s%n", "Date", "Time", "Description", "Vendor", "Amount");
+        System.out.println("=".repeat(width.total));
+    }
+    private static void printRow(Transaction t, ColumnWidth width){
+        System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getPrice());
     }
 
     private static void displayLedger(ColumnWidth width) {
+        columnSetUp(width);
         for (Transaction t : transactions) {
-            System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getPrice());
+            printRow(t, width);
         }
         System.out.println("\n");
     }
 
     private static void displayDeposits(ColumnWidth width) {
+        columnSetUp(width);
         for (Transaction t: transactions){
             if (t.getPrice() > 0){
-                System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getPrice());
+                printRow(t, width);
             }
         }
         System.out.println("\n");
     }
 
     private static void displayPayments(ColumnWidth width){
+        columnSetUp(width);
         for(Transaction t: transactions){
             if (t.getPrice() < 0) {
-                System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getPrice());
+                printRow(t, width);
             }
         }
         System.out.println("\n");
@@ -284,12 +290,12 @@ public class FinancialTracker {
                 case "1" -> {/* TODO – month-to-date report */
                     boolean hasSomething = false;
                     LocalDateTime today = LocalDateTime.now();
-                    columnWidths();
+                    columnSetUp(width);
                     int month = today.getMonthValue();
                     int year = today.getYear();
                     for (Transaction t: transactions){
                         if (t.getDate().getMonthValue() == month && t.getDate().getYear() == year) {
-                            System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getPrice());
+                            printRow(t, width);
                             hasSomething = true;
                         }
                     }
@@ -300,7 +306,7 @@ public class FinancialTracker {
                 case "2" -> {
                     boolean hasSomething = false;
                     LocalDateTime today = LocalDateTime.now();
-                    columnWidths();
+                    columnSetUp(width);
                     int month = today.getMonthValue();
                     int year = today.getYear();
                     if (month > 1) {
@@ -311,7 +317,7 @@ public class FinancialTracker {
                     }
                     for (Transaction t: transactions){
                         if (t.getDate().getMonthValue() == month && t.getDate().getYear() == year) {
-                            System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getPrice());
+                            printRow(t, width);
                             hasSomething = true;
                         }
                     }
@@ -322,11 +328,11 @@ public class FinancialTracker {
                 case "3" -> {
                     boolean hasSomething = false;
                     LocalDateTime today = LocalDateTime.now();
-                    columnWidths();
+                    columnSetUp(width);
                     int year = today.getYear();
                     for (Transaction t: transactions){
                         if (t.getDate().getYear() == year) {
-                            System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getPrice());
+                            printRow(t, width);
                             hasSomething = true;
                         }
                     }
@@ -337,11 +343,11 @@ public class FinancialTracker {
                 case "4" -> {
                     boolean hasSomething = false;
                     LocalDateTime today = LocalDateTime.now();
-                    columnWidths();
+                    columnSetUp(width);
                     int year = today.getYear();
                     for (Transaction t: transactions){
                         if (t.getDate().getYear() == year - 1) {
-                            System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getPrice());
+                            printRow(t, width);
                             hasSomething = true;
                         }
                     }
@@ -353,10 +359,10 @@ public class FinancialTracker {
                     boolean hasSomething = false;
                     System.out.print("Vendor Search: ");
                     String vendor = scanner.nextLine();
-                    columnWidths();
+                    columnSetUp(width);
                     for(Transaction t: transactions){
                         if(t.getVendor().equalsIgnoreCase(vendor)){
-                            System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getPrice());
+                            printRow(t, width);
                             hasSomething = true;
                         }
                     }
