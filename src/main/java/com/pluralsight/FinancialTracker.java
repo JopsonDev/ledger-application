@@ -141,7 +141,7 @@ public class FinancialTracker {
         Transaction newDeposit = new Transaction(date, time, description, vendor, amount);
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter("Test.csv", true));
-            writer.write(String.valueOf(newDeposit));
+            writer.write(newDeposit + "\n");
             writer.close();
         }catch (Exception c){
             System.out.println("failed to write");
@@ -154,8 +154,45 @@ public class FinancialTracker {
      * then converted to a negative amount before storing.
      */
     private static void addPayment(Scanner scanner) {
-        // TODO
+        LocalDate date;
+        LocalTime time;
+        while (true) {
+            try {
+                System.out.print("Date and Time (yyyy-MM-dd HH:mm:ss): ");
+                String input = scanner.nextLine();
+                LocalDateTime dateTime = LocalDateTime.parse(input, DATETIME_FMT);
+                date = dateTime.toLocalDate();
+                time = dateTime.toLocalTime();
+                break;
+            } catch (Exception b) {
+                System.out.println("Invalid Date input Use yyyy-MM-dd HH:mm:ss)");
+            }
+        }
+        System.out.print("Description: ");
+        String description = scanner.nextLine();
+        System.out.print("Vendor: ");
+        String vendor = scanner.nextLine();
+        double amount;
+        while (true) {
+            System.out.println("Payment: ");
+            amount = scanner.nextDouble();
+            scanner.nextLine();
+            amount = amount * -1;
+            if (amount <= 0) { break;
+            } else {
+                System.out.println("Please enter as a Positive.");
+            }
+        }
+        Transaction newPayment = new Transaction(date, time, description, vendor, amount);
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter("Test.csv", true));
+            writer.write(newPayment + "\n");
+            writer.close();
+        }catch (Exception c){
+            System.out.println("failed to write");
+        }
     }
+
 
     /* ------------------------------------------------------------------
        Ledger menu
