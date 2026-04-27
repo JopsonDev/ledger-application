@@ -281,22 +281,89 @@ public class FinancialTracker {
             String input = scanner.nextLine().trim();
 
             switch (input) {
-                case "1" -> {
-                    System.out.println("Starting Date(yyyy-MM-dd): ");
-                    String date = scanner.nextLine();
-                    LocalDate dateFormatted = LocalDate.parse(date, DATE_FMT);
-                    for(Transaction t: transactions){
-                        if (t.getDate().isAfter(dateFormatted) || t.getDate().isEqual(dateFormatted)){
+                case "1" -> {/* TODO – month-to-date report */
+                    boolean hasSomething = false;
+                    LocalDateTime today = LocalDateTime.now();
+                    columnWidths();
+                    int month = today.getMonthValue();
+                    int year = today.getYear();
+                    for (Transaction t: transactions){
+                        if (t.getDate().getMonthValue() == month && t.getDate().getYear() == year) {
                             System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getPrice());
+                            hasSomething = true;
                         }
                     }
+                    if (!hasSomething){
+                        System.out.println("No transactions this month");
+                    }
                 }
-                case "2" -> {/* TODO – previous month report */
-
+                case "2" -> {
+                    boolean hasSomething = false;
+                    LocalDateTime today = LocalDateTime.now();
+                    columnWidths();
+                    int month = today.getMonthValue();
+                    int year = today.getYear();
+                    if (month > 1) {
+                        month -= 1;
+                    } else {
+                        month = 12;
+                        year -= 1;
+                    }
+                    for (Transaction t: transactions){
+                        if (t.getDate().getMonthValue() == month && t.getDate().getYear() == year) {
+                            System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getPrice());
+                            hasSomething = true;
+                        }
+                    }
+                    if (!hasSomething){
+                        System.out.println("No transactions this year");
+                    }
                 }
-                case "3" -> {/* TODO – year-to-date report   */ }
-                case "4" -> {/* TODO – previous year report  */ }
-                case "5" -> {/* TODO – prompt for vendor then report */ }
+                case "3" -> {
+                    boolean hasSomething = false;
+                    LocalDateTime today = LocalDateTime.now();
+                    columnWidths();
+                    int year = today.getYear();
+                    for (Transaction t: transactions){
+                        if (t.getDate().getYear() == year) {
+                            System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getPrice());
+                            hasSomething = true;
+                        }
+                    }
+                    if (!hasSomething){
+                        System.out.println("No transactions this year");
+                    }
+                }
+                case "4" -> {
+                    boolean hasSomething = false;
+                    LocalDateTime today = LocalDateTime.now();
+                    columnWidths();
+                    int year = today.getYear();
+                    for (Transaction t: transactions){
+                        if (t.getDate().getYear() == year - 1) {
+                            System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getPrice());
+                            hasSomething = true;
+                        }
+                    }
+                    if (!hasSomething){
+                        System.out.println("No transactions last year");
+                    }
+                }
+                case "5" -> {
+                    boolean hasSomething = false;
+                    System.out.print("Vendor Search: ");
+                    String vendor = scanner.nextLine();
+                    columnWidths();
+                    for(Transaction t: transactions){
+                        if(t.getVendor().equalsIgnoreCase(vendor)){
+                            System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getPrice());
+                            hasSomething = true;
+                        }
+                    }
+                    if (!hasSomething){
+                        System.out.println("No transactions with this vendor");
+                    }
+                }
                 case "6" -> customSearch(scanner);
                 case "0" -> running = false;
                 default -> System.out.println("Invalid option");
