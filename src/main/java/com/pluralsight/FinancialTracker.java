@@ -211,9 +211,9 @@ public class FinancialTracker {
             String input = scanner.nextLine().trim();
 
             switch (input.toUpperCase()) {
-                case "A" -> displayLedger();
-                case "D" -> displayDeposits();
-                case "P" -> displayPayments();
+                case "A" -> displayLedger(columnWidths());
+                case "D" -> displayDeposits(columnWidths());
+                case "P" -> displayPayments(columnWidths());
                 case "R" -> reportsMenu(scanner);
                 case "H" -> running = false;
                 default -> System.out.println("Invalid option");
@@ -224,36 +224,46 @@ public class FinancialTracker {
     /* ------------------------------------------------------------------
        Display helpers: show data in neat columns
        ------------------------------------------------------------------ */
-    private static void displayLedger() {
+    private static ColumnWidth columnWidths(){
+        int dateLength = "date".length();
+        int timeLength = "time".length();
+        int descriptionLength = "description".length();
+        int vendorLength = "vendor".length();
+
+        for (Transaction t : transactions){
+            dateLength = Math.max(dateLength, t.getDate().toString().length());
+            timeLength = Math.max(timeLength, t.getTime().toString().length());
+            descriptionLength = Math.max(descriptionLength, t.getDescription().length());
+            vendorLength = Math.max(vendorLength, t.getVendor().length());
+        }
+        int totalLength = dateLength + timeLength + descriptionLength + vendorLength + 11 + 8; // 11 = amount column width, 8 = spaces between columns
+        System.out.printf("%-" + dateLength + "s %-" + timeLength + "s %-" + descriptionLength + "s %-" + vendorLength + "s %10s%n", "Date", "Time", "Description", "Vendor", "Amount");
+        System.out.println("=".repeat(totalLength));
+        return new ColumnWidth(dateLength,timeLength,descriptionLength,vendorLength);
+    }
+
+    private static void displayLedger(ColumnWidth width) {
         /* TODO – print all transactions in column format */
-        try {
-            int dateLength = "date".length();
-            int timeLength = "time".length();
-            int descriptionLength = "description".length();
-            int vendorLength = "vendor".length();
-
-            for (Transaction t : transactions){
-                dateLength = Math.max(dateLength, t.getDate().toString().length());
-                timeLength = Math.max(timeLength, t.getTime().toString().length());
-                descriptionLength = Math.max(descriptionLength, t.getDescription().length());
-                vendorLength = Math.max(vendorLength, t.getVendor().length());
-            }
-            int totalLength = dateLength + timeLength + descriptionLength + vendorLength + 11 + 8; // 11 = amount column width, 8 = spaces between columns
-            System.out.printf("%-" + dateLength + "s %-" + timeLength + "s %-" + descriptionLength + "s %-" + vendorLength + "s %10s%n", "Date", "Time", "Description", "Vendor", "Amount");
-            System.out.println("=".repeat(totalLength));
-
-            for (Transaction t: transactions){
-                System.out.printf("%-" + dateLength + "s %-" + timeLength + "s %-" + descriptionLength + "s %-" + vendorLength + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getPrice());
-            }
-
-        } catch (Exception d){
-            System.out.println("Failed to load Transactions");
+        for (Transaction t : transactions) {
+            System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getPrice());
         }
     }
 
-    private static void displayDeposits() { /* TODO – only amount > 0               */ }
+    private static void displayDeposits(ColumnWidth width) {
+        for (Transaction t: transactions){
+            if (t.getPrice() > 0){
+                System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getPrice());
+            }
+        }
+    }
 
-    private static void displayPayments() { /* TODO – only amount < 0               */ }
+    private static void displayPayments(ColumnWidth width){
+        for(Transaction t: transactions){
+            if (t.getPrice() < 0) {
+                System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getPrice());
+            }
+        }
+    }
 
     /* ------------------------------------------------------------------
        Reports menu
