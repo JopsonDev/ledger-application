@@ -194,9 +194,7 @@ public class FinancialTracker {
     }
 
 
-    /* ------------------------------------------------------------------
-       Ledger menu
-       ------------------------------------------------------------------ */
+
     private static void ledgerMenu(Scanner scanner) {
         boolean running = true;
         while (running) {
@@ -214,21 +212,18 @@ public class FinancialTracker {
                 case "A" -> displayLedger(columnWidths());
                 case "D" -> displayDeposits(columnWidths());
                 case "P" -> displayPayments(columnWidths());
-                case "R" -> reportsMenu(scanner);
+                case "R" -> reportsMenu(scanner, columnWidths());
                 case "H" -> running = false;
                 default -> System.out.println("Invalid option");
             }
         }
     }
 
-    /* ------------------------------------------------------------------
-       Display helpers: show data in neat columns
-       ------------------------------------------------------------------ */
     private static ColumnWidth columnWidths(){
-        int dateLength = "date".length();
-        int timeLength = "time".length();
-        int descriptionLength = "description".length();
-        int vendorLength = "vendor".length();
+        int dateLength = "Date".length();
+        int timeLength = "Time".length();
+        int descriptionLength = "Description".length();
+        int vendorLength = "Vendor".length();
 
         for (Transaction t : transactions){
             dateLength = Math.max(dateLength, t.getDate().toString().length());
@@ -243,10 +238,10 @@ public class FinancialTracker {
     }
 
     private static void displayLedger(ColumnWidth width) {
-        /* TODO – print all transactions in column format */
         for (Transaction t : transactions) {
             System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getPrice());
         }
+        System.out.println("\n");
     }
 
     private static void displayDeposits(ColumnWidth width) {
@@ -255,6 +250,7 @@ public class FinancialTracker {
                 System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getPrice());
             }
         }
+        System.out.println("\n");
     }
 
     private static void displayPayments(ColumnWidth width){
@@ -263,12 +259,13 @@ public class FinancialTracker {
                 System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getPrice());
             }
         }
+        System.out.println("\n");
     }
 
     /* ------------------------------------------------------------------
        Reports menu
        ------------------------------------------------------------------ */
-    private static void reportsMenu(Scanner scanner) {
+    private static void reportsMenu(Scanner scanner, ColumnWidth width) {
         boolean running = true;
         while (running) {
             System.out.println("Reports");
@@ -284,8 +281,19 @@ public class FinancialTracker {
             String input = scanner.nextLine().trim();
 
             switch (input) {
-                case "1" -> {/* TODO – month-to-date report */ }
-                case "2" -> {/* TODO – previous month report */ }
+                case "1" -> {
+                    System.out.println("Starting Date(yyyy-MM-dd): ");
+                    String date = scanner.nextLine();
+                    LocalDate dateFormatted = LocalDate.parse(date, DATE_FMT);
+                    for(Transaction t: transactions){
+                        if (t.getDate().isAfter(dateFormatted) || t.getDate().isEqual(dateFormatted)){
+                            System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getPrice());
+                        }
+                    }
+                }
+                case "2" -> {/* TODO – previous month report */
+
+                }
                 case "3" -> {/* TODO – year-to-date report   */ }
                 case "4" -> {/* TODO – previous year report  */ }
                 case "5" -> {/* TODO – prompt for vendor then report */ }
