@@ -211,7 +211,7 @@ public class FinancialTracker {
             String input = scanner.nextLine().trim();
 
             switch (input.toUpperCase()) {
-                case "A" -> displayLedger(FILE_NAME);
+                case "A" -> displayLedger();
                 case "D" -> displayDeposits();
                 case "P" -> displayPayments();
                 case "R" -> reportsMenu(scanner);
@@ -224,43 +224,28 @@ public class FinancialTracker {
     /* ------------------------------------------------------------------
        Display helpers: show data in neat columns
        ------------------------------------------------------------------ */
-    private static void displayLedger(String fileName) {
+    private static void displayLedger() {
         /* TODO – print all transactions in column format */
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(fileName));
-            String line;
-            boolean oneTime = false;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split("\\|");
-                LocalDate date = LocalDate.parse(parts[0]);
-                LocalTime time = LocalTime.parse(parts[1]);
-                String description = parts[2];
-                String vendor = parts[3];
-                double amount = Double.parseDouble(parts[4]);
+            int dateLength = "date".length();
+            int timeLength = "time".length();
+            int descriptionLength = "description".length();
+            int vendorLength = "vendor".length();
 
-                int dateLength = parts[0].length();
-                int timeLength = parts[1].length();
-                int descriptionLength = parts[2].length();
-                int vendorLength = parts[3].length();
-                int totalLength = 0;
-
-                for (Transaction t : transactions){
-                    dateLength = Math.max(dateLength, t.getDate().toString().length());
-                    timeLength = Math.max(timeLength, t.getTime().toString().length());
-                    descriptionLength = Math.max(descriptionLength, t.getDescription().length());
-                    vendorLength = Math.max(vendorLength, t.getVendor().length());
-                }
-
-                while(!oneTime) {
-                    totalLength = dateLength + timeLength + descriptionLength + vendorLength + 10 + 8; // 10 = number of columns 8 number of spaces
-
-
-                    System.out.printf("%-" + dateLength + "s %-" + timeLength + "s %-" + descriptionLength + "s %-" + vendorLength + "s %10s%n", "Date", "Time", "Description", "Vendor", "Amount");
-                    System.out.println("=".repeat(totalLength));
-                    oneTime = true;
-                }
-                System.out.printf("%-" + dateLength + "s %-" + timeLength + "s %-" + descriptionLength + "s %-" + vendorLength + "s %10s%n", date, time, description, vendor, amount);
+            for (Transaction t : transactions){
+                dateLength = Math.max(dateLength, t.getDate().toString().length());
+                timeLength = Math.max(timeLength, t.getTime().toString().length());
+                descriptionLength = Math.max(descriptionLength, t.getDescription().length());
+                vendorLength = Math.max(vendorLength, t.getVendor().length());
             }
+            int totalLength = dateLength + timeLength + descriptionLength + vendorLength + 11 + 8; // 11 = amount column width, 8 = spaces between columns
+            System.out.printf("%-" + dateLength + "s %-" + timeLength + "s %-" + descriptionLength + "s %-" + vendorLength + "s %10s%n", "Date", "Time", "Description", "Vendor", "Amount");
+            System.out.println("=".repeat(totalLength));
+
+            for (Transaction t: transactions){
+                System.out.printf("%-" + dateLength + "s %-" + timeLength + "s %-" + descriptionLength + "s %-" + vendorLength + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getPrice());
+            }
+
         } catch (Exception d){
             System.out.println("Failed to load Transactions");
         }
