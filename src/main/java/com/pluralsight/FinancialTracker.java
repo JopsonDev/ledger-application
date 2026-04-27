@@ -86,9 +86,9 @@ public class FinancialTracker {
                 LocalTime time = LocalTime.parse(parts[1]);
                 String description = parts[2];
                 String vendor = parts[3];
-                double price = Double.parseDouble(parts[4]);
+                double amount = Double.parseDouble(parts[4]);
 
-                Transaction object = new Transaction(date, time, description, vendor, price);
+                Transaction object = new Transaction(date, time, description, vendor, amount);
                 transactions.add(object);
                 System.out.println(transactions);
 
@@ -211,7 +211,7 @@ public class FinancialTracker {
             String input = scanner.nextLine().trim();
 
             switch (input.toUpperCase()) {
-                case "A" -> displayLedger();
+                case "A" -> displayLedger(FILE_NAME);
                 case "D" -> displayDeposits();
                 case "P" -> displayPayments();
                 case "R" -> reportsMenu(scanner);
@@ -224,7 +224,37 @@ public class FinancialTracker {
     /* ------------------------------------------------------------------
        Display helpers: show data in neat columns
        ------------------------------------------------------------------ */
-    private static void displayLedger() { /* TODO – print all transactions in column format */ }
+    private static void displayLedger(String fileName) {
+        /* TODO – print all transactions in column format */
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(fileName));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split("\\|");
+                LocalDate date = LocalDate.parse(parts[0]);
+                LocalTime time = LocalTime.parse(parts[1]);
+                String description = parts[2];
+                String vendor = parts[3];
+                double amount = Double.parseDouble(parts[4]);
+
+                int dateLength = parts[0].length();
+                int timeLength = parts[1].length();
+                int descriptionLength = parts[2].length();
+                int vendorLength = parts[3].length();
+
+                for (Transaction t : transactions){
+                    dateLength = Math.max(dateLength, t.getDate().toString().length());
+                    timeLength = Math.max(timeLength, t.getTime().toString().length());
+                    descriptionLength = Math.max(descriptionLength, t.getDescription().length());
+                    vendorLength = Math.max(vendorLength, t.getVendor().length());
+                }
+
+                System.out.printf("%-" + dateLength + "s %-" + timeLength + "s %-" + descriptionLength + "s %-" + vendorLength + "s %10s%n", date, time, description, vendor, amount);
+            }
+        } catch (Exception d){
+            System.out.println("Failed to load Transactions");
+        }
+    }
 
     private static void displayDeposits() { /* TODO – only amount > 0               */ }
 
