@@ -8,14 +8,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-/*
- * Capstone skeleton – personal finance tracker.
- * ------------------------------------------------
- * File format  (pipe-delimited)
- *     yyyy-MM-dd|HH:mm:ss|description|vendor|amount
- * A deposit has a positive amount; a payment is stored
- * as a negative amount.
- */
 public class FinancialTracker {
 
     /* ------------------------------------------------------------------
@@ -59,16 +51,13 @@ public class FinancialTracker {
         scanner.close();
     }
     public static void loadTransactions(String fileName, ArrayList<Transaction> transactions) {
-        // TODO: create file if it does not exist, then read each line,
-        //       parse the five fields, build a Transaction object,
-        //       and add it to the transactions list.
         try {
             BufferedReader reader = new BufferedReader(new FileReader(fileName));
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split("\\|");
-                LocalDate date = LocalDate.parse(parts[0]);
-                LocalTime time = LocalTime.parse(parts[1]);
+                LocalDate date = LocalDate.parse(parts[0], DATE_FMT);
+                LocalTime time = LocalTime.parse(parts[1], TIME_FMT);
                 String description = parts[2];
                 String vendor = parts[3];
                 double amount = Double.parseDouble(parts[4]);
@@ -176,9 +165,8 @@ public class FinancialTracker {
         System.out.println("=".repeat(width.total));
     }
     private static void printRow(Transaction t, ColumnWidth width){
-        System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getAmount());
+        System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate().format(DATE_FMT), t.getTime().format(TIME_FMT), t.getDescription(), t.getVendor(), t.getAmount());
     }
-
     private static void displayLedger(ColumnWidth width) {
         columnSetUp(width);
         for (Transaction t : transactions) {
@@ -186,7 +174,6 @@ public class FinancialTracker {
         }
         System.out.println("\n");
     }
-
     private static void displayDeposits(ColumnWidth width) {
         columnSetUp(width);
         for (Transaction t: transactions){
@@ -196,7 +183,6 @@ public class FinancialTracker {
         }
         System.out.println("\n");
     }
-
     private static void displayPayments(ColumnWidth width){
         columnSetUp(width);
         for(Transaction t: transactions){
@@ -206,10 +192,6 @@ public class FinancialTracker {
         }
         System.out.println("\n");
     }
-
-    /* ------------------------------------------------------------------
-       Reports menu
-       ------------------------------------------------------------------ */
     private static void reportsMenu(Scanner scanner, ColumnWidth width) {
         boolean running = true;
         while (running) {
@@ -226,7 +208,7 @@ public class FinancialTracker {
             String input = scanner.nextLine().trim();
 
             switch (input) {
-                case "1" -> {/* TODO – month-to-date report */
+                case "1" -> {
                     LocalDate today = LocalDate.now();
                     LocalDate startOfMonth = today.withDayOfMonth(1);
                     filterTransactionsByDate(startOfMonth, today, columnWidths());
@@ -260,10 +242,6 @@ public class FinancialTracker {
             }
         }
     }
-
-    /* ------------------------------------------------------------------
-       Reporting helpers
-       ------------------------------------------------------------------ */
     private static void filterTransactionsByDate(LocalDate start, LocalDate end, ColumnWidth width) {
         boolean hasSomething = false;
         for (Transaction t: transactions) {
@@ -277,10 +255,7 @@ public class FinancialTracker {
         if (!hasSomething){
             System.out.println("No transactions found");
         }
-
-        // TODO – iterate transactions, print those within the range
-    } //got do this and vendor
-
+    }
     private static void filterTransactionsByVendor(String vendor, ColumnWidth width) {
         boolean hasSomething = false;
 
@@ -294,35 +269,57 @@ public class FinancialTracker {
             System.out.println("No transactions with this vendor");
         }
     }
-
     private static void customSearch(Scanner scanner) {
         System.out.println("Please enter the information below");
         System.out.print("Start Date(yyyy-MM-dd): ");
+        LocalDate startDate = parseDate(scanner.nextLine());
+
         System.out.print("End Date(yyyy-MM-dd): ");
+        LocalDate endDate = parseDate(scanner.nextLine());
+
         System.out.print("Description: ");
+        String description = scanner.nextLine();
+
         System.out.print("Vendor: ");
+        String vendor = scanner.nextLine();
+
         System.out.print("Exact Amount: ");
-        LocalDate date;
-        LocalDate endDate;
-        String description;
-        String vendor;
-        Double amount;
+        String amountString = scanner.nextLine();
+        Double amount = parseDouble(amountString);
 
-        // TODO – prompt for any combination of date range, description,
-        //        vendor, and exact amount, then display matches
+        if (startDate == null) {
+            startDate = parseDate("0001-01-01");
+        }
+        if (endDate == null) {
+            endDate = parseDate("9999-12-31");
+        }
+        boolean found = false;
+        columnSetUp(columnWidths());
+        for (Transaction t : transactions) {
+            LocalDate date = t.getDate();
+            if (!date.isBefore(startDate) && !date.isAfter(endDate) && (description.isEmpty() || description.equalsIgnoreCase(t.getDescription())) && (vendor.isEmpty() || vendor.equalsIgnoreCase(t.getVendor())) && (amount == null || amount == t.getAmount())) {
+                printRow(t, columnWidths());
+                found = true;
+            }
+        }
+        if(!found){
+            System.out.println("No transactions found");
+        }
     }
-
-    /* ------------------------------------------------------------------
-       Utility parsers (you can reuse in many places)
-       ------------------------------------------------------------------ */
     private static LocalDate parseDate(String s) {
-        /* TODO – return LocalDate or null */
-        return null;
+        try{
+            return LocalDate.parse(s);
+        }catch(Exception y) {
+            return null;
+        }
     }
 
     private static Double parseDouble(String s) {
-        double d = Double.parseDouble(s);
-        return null;
+       try{
+           return Double.parseDouble(s);
+       } catch (Exception z) {
+           return null;
+       }
     }
 }
  
