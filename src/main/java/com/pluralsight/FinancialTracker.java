@@ -303,19 +303,9 @@ public class FinancialTracker {
                     filterTransactionsByDate(yearStart, yearEnd, columnWidths());
                 }
                 case "5" -> {
-                    boolean hasSomething = false;
                     System.out.print("Vendor Search: ");
                     String vendor = scanner.nextLine();
-                    columnSetUp(width);
-                    for(Transaction t: transactions){
-                        if(t.getVendor().equalsIgnoreCase(vendor)){
-                            printRow(t, width);
-                            hasSomething = true;
-                        }
-                    }
-                    if (!hasSomething){
-                        System.out.println("No transactions with this vendor");
-                    }
+                    filterTransactionsByVendor(vendor, columnWidths());
                 }
                 case "6" -> customSearch(scanner);
                 case "0" -> running = false;
@@ -344,8 +334,18 @@ public class FinancialTracker {
         // TODO – iterate transactions, print those within the range
     } //got do this and vendor
 
-    private static void filterTransactionsByVendor(String vendor) {
-        // TODO – iterate transactions, print those with matching vendor
+    private static void filterTransactionsByVendor(String vendor, ColumnWidth width) {
+        boolean hasSomething = false;
+
+        for(Transaction t: transactions){
+            if(t.getVendor().equalsIgnoreCase(vendor)){
+                printRow(t, width);
+                hasSomething = true;
+            }
+        }
+        if (!hasSomething){
+            System.out.println("No transactions with this vendor");
+        }
     }
 
     private static void customSearch(Scanner scanner) {
