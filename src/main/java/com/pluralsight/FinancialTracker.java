@@ -266,6 +266,7 @@ public class FinancialTracker {
 
     private static void filterTransactionsByDate(LocalDate start, LocalDate end, ColumnWidth width) {
         boolean hasSomething = false;
+        printHeader(width);
         for (Transaction t: transactions) {
             LocalDate date = t.getDate();
 
@@ -277,12 +278,13 @@ public class FinancialTracker {
         if (!hasSomething){
             System.out.println("No transactions found");
         }
+        System.out.println("\n");
     }
 
 
     private static void filterTransactionsByVendor(String vendor, ColumnWidth width) {
         boolean hasSomething = false;
-
+        printHeader(width);
         for(Transaction t: transactions){
             if(t.getVendor().equalsIgnoreCase(vendor)){
                 printRow(t, width);
@@ -292,10 +294,11 @@ public class FinancialTracker {
         if (!hasSomething){
             System.out.println("No transactions with this vendor");
         }
+        System.out.println("\n");
     }
 
     private static void customSearch(Scanner scanner, ColumnWidth width) {
-        System.out.println("Please enter the information below");
+        System.out.println("Please enter the information below, press enter to leave blank.");
         System.out.print("Start Date(yyyy-MM-dd): ");
         LocalDate startDate = parseDate(scanner.nextLine());
 
@@ -331,9 +334,10 @@ public class FinancialTracker {
         if(!found){
             System.out.println("No transactions found");
         }
+        System.out.println("\n");
     }
 
-    private static LocalDate parseDate(String s) {
+    private static LocalDate parseDate(String s) { // need to add fail message
         try{
             return LocalDate.parse(s);
         }catch(Exception y) {
@@ -341,7 +345,7 @@ public class FinancialTracker {
         }
     }
 
-    private static Double parseDouble(String s) {
+    private static Double parseDouble(String s) { // need to add fail message
        try{
            return Double.parseDouble(s);
        } catch (Exception z) {
