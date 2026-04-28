@@ -24,6 +24,8 @@ public class FinancialTracker {
     public static void main(String[] args) {
         loadTransactions(FILE_NAME, transactions);
 
+        sorted();
+
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
 
@@ -51,6 +53,7 @@ public class FinancialTracker {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(fileName));
             String line;
+
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split("\\|");
                 LocalDate date = LocalDate.parse(parts[0], DATE_FMT);
@@ -70,13 +73,16 @@ public class FinancialTracker {
     private static Transaction getTransactionInfo(Scanner scanner){
         LocalDate date;
         LocalTime time;
+
         while (true) {
             try {
                 System.out.print("Date and Time (yyyy-MM-dd HH:mm:ss): ");
                 String input = scanner.nextLine();
+
                 LocalDateTime dateTime = LocalDateTime.parse(input, DATETIME_FMT);
                 date = dateTime.toLocalDate();
                 time = dateTime.toLocalTime();
+
                 break;
             } catch (Exception b) {
                 System.out.println("Invalid Date input Use yyyy-MM-dd HH:mm:ss)");
@@ -86,15 +92,19 @@ public class FinancialTracker {
         String description = scanner.nextLine();
         System.out.print("Vendor: ");
         String vendor = scanner.nextLine();
+
         double amount;
         while (true) {
             System.out.print("Amount: ");
             amount = scanner.nextDouble();
             scanner.nextLine();
-            if (amount < 0) { System.out.println("Amount needs to be a positive number.");
+
+            if (amount < 0) {
+                System.out.println("Amount needs to be a positive number.");
             } else { break;
             }
         }
+
         return new Transaction(date, time, description, vendor, amount);
     }
 
@@ -103,9 +113,12 @@ public class FinancialTracker {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, true));
             writer.write(newDeposit + "\n");
+
             System.out.println("Deposit Added");
+            sorted();
+
             writer.close();
-        } catch (Exception c){
+        } catch (Exception c) {
             System.out.println("failed to write");
         }
     }
@@ -113,12 +126,16 @@ public class FinancialTracker {
     private static void addPayment(Scanner scanner) {
         Transaction newPayment = getTransactionInfo(scanner);
         newPayment.setAmount(newPayment.getAmount() * -1);
+
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, true));
             writer.write(newPayment + "\n");
+
             System.out.println("Payment added");
+            sorted();
+
             writer.close();
-        }catch (Exception c){
+        }catch (Exception c) {
             System.out.println("failed to write");
         }
     }
@@ -172,8 +189,13 @@ public class FinancialTracker {
         System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate().format(DATE_FMT), t.getTime().format(TIME_FMT), t.getDescription(), t.getVendor(), t.getAmount());
     }
 
+    private static void sorted(){
+        transactions.sort((t1, t2) -> LocalDateTime.of(t2.getDate(), t2.getTime()).compareTo(LocalDateTime.of(t1.getDate(), t1.getTime())));
+    }
+
     private static void displayLedger(ColumnWidth width) {
         printHeader(width);
+
         for (Transaction t : transactions) {
             printRow(t, width);
         }
@@ -219,29 +241,34 @@ public class FinancialTracker {
                 case "1" -> {
                     LocalDate today = LocalDate.now();
                     LocalDate startOfMonth = today.withDayOfMonth(1);
+
                     filterTransactionsByDate(startOfMonth, today, columnWidths());
                 }
                 case "2" -> {
                     LocalDate today = LocalDate.now();
                     LocalDate previousMonth = today.withDayOfMonth(1).minusMonths(1);
                     LocalDate endOfPreviousMonth = today.withDayOfMonth(1).minusDays(1);
+
                     filterTransactionsByDate(previousMonth, endOfPreviousMonth, columnWidths());
                 }
                 case "3" -> {
                     LocalDate today = LocalDate.now();
                     LocalDate yearStart = today.withDayOfYear(1);
                     LocalDate yearEnd = today.withDayOfYear(today.lengthOfYear());
+
                     filterTransactionsByDate(yearStart, yearEnd, columnWidths());
                 }
                 case "4" -> {
                     LocalDate today = LocalDate.now();
                     LocalDate yearStart = today.withDayOfYear(1).minusYears(1);
                     LocalDate yearEnd = yearStart.withDayOfYear(yearStart.lengthOfYear());
+
                     filterTransactionsByDate(yearStart, yearEnd, columnWidths());
                 }
                 case "5" -> {
                     System.out.print("Vendor Search: ");
                     String vendor = scanner.nextLine();
+
                     filterTransactionsByVendor(vendor, columnWidths());
                 }
                 case "6" -> customSearch(scanner,columnWidths());
