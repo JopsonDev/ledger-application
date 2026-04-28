@@ -1,13 +1,11 @@
 package com.pluralsight;
 
 import java.io.*;
-import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Scanner;
 
 /*
@@ -146,11 +144,6 @@ public class FinancialTracker {
         }
     }
 
-    /**
-     * Same prompts as addDeposit.
-     * Amount must be entered as a positive number,
-     * then converted to a negative amount before storing.
-     */
     private static void addPayment(Scanner scanner) {
         LocalDate date;
         LocalTime time;
@@ -176,9 +169,8 @@ public class FinancialTracker {
             amount = scanner.nextDouble();
             scanner.nextLine();
             amount = amount * -1;
-            if (amount <= 0) { break;
-            } else {
-                System.out.println("Please enter as a Positive.");
+            if (amount >= 0) { System.out.println("Please enter as a Positive.");
+            } else { break;
             }
         }
         Transaction newPayment = new Transaction(date, time, description, vendor, amount);
@@ -237,7 +229,7 @@ public class FinancialTracker {
         System.out.println("=".repeat(width.total));
     }
     private static void printRow(Transaction t, ColumnWidth width){
-        System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getPrice());
+        System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getAmount());
     }
 
     private static void displayLedger(ColumnWidth width) {
@@ -251,7 +243,7 @@ public class FinancialTracker {
     private static void displayDeposits(ColumnWidth width) {
         columnSetUp(width);
         for (Transaction t: transactions){
-            if (t.getPrice() > 0){
+            if (t.getAmount() > 0){
                 printRow(t, width);
             }
         }
@@ -261,7 +253,7 @@ public class FinancialTracker {
     private static void displayPayments(ColumnWidth width){
         columnSetUp(width);
         for(Transaction t: transactions){
-            if (t.getPrice() < 0) {
+            if (t.getAmount() < 0) {
                 printRow(t, width);
             }
         }
@@ -288,72 +280,27 @@ public class FinancialTracker {
 
             switch (input) {
                 case "1" -> {/* TODO – month-to-date report */
-                    boolean hasSomething = false;
-                    LocalDateTime today = LocalDateTime.now();
-                    columnSetUp(width);
-                    int month = today.getMonthValue();
-                    int year = today.getYear();
-                    for (Transaction t: transactions){
-                        if (t.getDate().getMonthValue() == month && t.getDate().getYear() == year) {
-                            printRow(t, width);
-                            hasSomething = true;
-                        }
-                    }
-                    if (!hasSomething){
-                        System.out.println("No transactions this month");
-                    }
+                    LocalDate today = LocalDate.now();
+                    LocalDate startOfMonth = today.withDayOfMonth(1);
+                    filterTransactionsByDate(startOfMonth, today, columnWidths());
                 }
                 case "2" -> {
-                    boolean hasSomething = false;
-                    LocalDateTime today = LocalDateTime.now();
-                    columnSetUp(width);
-                    int month = today.getMonthValue();
-                    int year = today.getYear();
-                    if (month > 1) {
-                        month -= 1;
-                    } else {
-                        month = 12;
-                        year -= 1;
-                    }
-                    for (Transaction t: transactions){
-                        if (t.getDate().getMonthValue() == month && t.getDate().getYear() == year) {
-                            printRow(t, width);
-                            hasSomething = true;
-                        }
-                    }
-                    if (!hasSomething){
-                        System.out.println("No transactions last month");
-                    }
+                    LocalDate today = LocalDate.now();
+                    LocalDate previousMonth = today.withDayOfMonth(1).minusMonths(1);
+                    LocalDate endOfPerviousMonth = today.withDayOfMonth(1).minusDays(1);
+                    filterTransactionsByDate(previousMonth, endOfPerviousMonth, columnWidths());
                 }
                 case "3" -> {
-                    boolean hasSomething = false;
-                    LocalDateTime today = LocalDateTime.now();
-                    columnSetUp(width);
-                    int year = today.getYear();
-                    for (Transaction t: transactions){
-                        if (t.getDate().getYear() == year) {
-                            printRow(t, width);
-                            hasSomething = true;
-                        }
-                    }
-                    if (!hasSomething){
-                        System.out.println("No transactions this year");
-                    }
+                    LocalDate today = LocalDate.now();
+                    LocalDate yearStart = today.withDayOfYear(1);
+                    LocalDate yearEnd = today.withDayOfYear(today.lengthOfYear());
+                    filterTransactionsByDate(yearStart, yearEnd, columnWidths());
                 }
                 case "4" -> {
-                    boolean hasSomething = false;
-                    LocalDateTime today = LocalDateTime.now();
-                    columnSetUp(width);
-                    int year = today.getYear();
-                    for (Transaction t: transactions){
-                        if (t.getDate().getYear() == year - 1) {
-                            printRow(t, width);
-                            hasSomething = true;
-                        }
-                    }
-                    if (!hasSomething){
-                        System.out.println("No transactions this year");
-                    }
+                    LocalDate today = LocalDate.now();
+                    LocalDate yearStart = today.withDayOfYear(1).minusYears(1);
+                    LocalDate yearEnd = yearStart.withDayOfYear(yearStart.lengthOfYear());
+                    filterTransactionsByDate(yearStart, yearEnd, columnWidths());
                 }
                 case "5" -> {
                     boolean hasSomething = false;
@@ -380,9 +327,22 @@ public class FinancialTracker {
     /* ------------------------------------------------------------------
        Reporting helpers
        ------------------------------------------------------------------ */
-    private static void filterTransactionsByDate(LocalDate start, LocalDate end) {
+    private static void filterTransactionsByDate(LocalDate start, LocalDate end, ColumnWidth width) {
+        boolean hasSomething = false;
+        for (Transaction t: transactions) {
+            LocalDate date = t.getDate();
+
+            if (!date.isBefore(start) && !date.isAfter(end)) {
+                printRow(t, width);
+                hasSomething = true;
+            }
+        }
+        if (!hasSomething){
+            System.out.println("No transactions found");
+        }
+
         // TODO – iterate transactions, print those within the range
-    }
+    } //got do this and vendor
 
     private static void filterTransactionsByVendor(String vendor) {
         // TODO – iterate transactions, print those with matching vendor
