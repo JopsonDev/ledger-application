@@ -126,12 +126,11 @@ public class FinancialTracker {
         String vendor = scanner.nextLine();
         double amount;
         while (true) {
-            System.out.println("Deposit: ");
+            System.out.print("Deposit: ");
             amount = scanner.nextDouble();
             scanner.nextLine();
-            if (amount > 0) { break;
-            } else {
-                System.out.println("Deposit needs to be a positive number.");
+            if (amount < 0) { System.out.println("Deposit needs to be a positive number.");
+            } else { break;
             }
         }
         Transaction newDeposit = new Transaction(date, time, description, vendor, amount);
@@ -287,8 +286,8 @@ public class FinancialTracker {
                 case "2" -> {
                     LocalDate today = LocalDate.now();
                     LocalDate previousMonth = today.withDayOfMonth(1).minusMonths(1);
-                    LocalDate endOfPerviousMonth = today.withDayOfMonth(1).minusDays(1);
-                    filterTransactionsByDate(previousMonth, endOfPerviousMonth, columnWidths());
+                    LocalDate endOfPreviousMonth = today.withDayOfMonth(1).minusDays(1);
+                    filterTransactionsByDate(previousMonth, endOfPreviousMonth, columnWidths());
                 }
                 case "3" -> {
                     LocalDate today = LocalDate.now();
@@ -349,6 +348,18 @@ public class FinancialTracker {
     }
 
     private static void customSearch(Scanner scanner) {
+        System.out.println("Please enter the information below");
+        System.out.print("Start Date(yyyy-MM-dd): ");
+        System.out.print("End Date(yyyy-MM-dd): ");
+        System.out.print("Description: ");
+        System.out.print("Vendor: ");
+        System.out.print("Exact Amount: ");
+        LocalDate date;
+        LocalDate endDate;
+        String description;
+        String vendor;
+        Double amount;
+
         // TODO – prompt for any combination of date range, description,
         //        vendor, and exact amount, then display matches
     }

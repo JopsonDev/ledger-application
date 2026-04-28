@@ -32,12 +32,6 @@ public class Transaction {
 
     @Override
     public String toString() {
-        return "Transaction{" +
-                "date='" + date + '\'' +
-                ", time='" + time + '\'' +
-                ", description='" + description + '\'' +
-                ", vendor='" + vendor + '\'' +
-                ", price=" + amount +
-                '}';
+        return date + "|" + time + "|" + description + "|" + vendor + "|" + amount;
     }
 }
