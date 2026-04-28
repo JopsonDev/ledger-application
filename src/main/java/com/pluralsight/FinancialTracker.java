@@ -10,9 +10,6 @@ import java.util.Scanner;
 
 public class FinancialTracker {
 
-    /* ------------------------------------------------------------------
-       Shared data and formatters
-       ------------------------------------------------------------------ */
     private static final ArrayList<Transaction> transactions = new ArrayList<>();
     private static final String FILE_NAME = "transactions.csv";
 
@@ -69,7 +66,8 @@ public class FinancialTracker {
             System.out.println("Error 1: couldn't load transactions.");
         }
     }
-    private static Transaction getInfo(Scanner scanner){
+
+    private static Transaction getTransactionInfo(Scanner scanner){
         LocalDate date;
         LocalTime time;
         while (true) {
@@ -99,22 +97,24 @@ public class FinancialTracker {
         }
         return new Transaction(date, time, description, vendor, amount);
     }
+
     private static void addDeposit(Scanner scanner) {
-        Transaction newDeposit = getInfo(scanner);
+        Transaction newDeposit = getTransactionInfo(scanner);
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter("Test.csv", true));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, true));
             writer.write(newDeposit + "\n");
             System.out.println("Deposit Added");
             writer.close();
-        }catch (Exception c){
+        } catch (Exception c){
             System.out.println("failed to write");
         }
     }
+
     private static void addPayment(Scanner scanner) {
-        Transaction newPayment = getInfo(scanner);
+        Transaction newPayment = getTransactionInfo(scanner);
         newPayment.setAmount(newPayment.getAmount() * -1);
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter("Test.csv", true));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, true));
             writer.write(newPayment + "\n");
             System.out.println("Payment added");
             writer.close();
@@ -122,6 +122,7 @@ public class FinancialTracker {
             System.out.println("failed to write");
         }
     }
+
     private static void ledgerMenu(Scanner scanner) {
         boolean running = true;
         while (running) {
@@ -139,12 +140,13 @@ public class FinancialTracker {
                 case "A" -> displayLedger(columnWidths());
                 case "D" -> displayDeposits(columnWidths());
                 case "P" -> displayPayments(columnWidths());
-                case "R" -> reportsMenu(scanner, columnWidths());
+                case "R" -> reportsMenu(scanner);
                 case "H" -> running = false;
                 default -> System.out.println("Invalid option");
             }
         }
     }
+
     private static ColumnWidth columnWidths(){
         int dateLength = "Date".length();
         int timeLength = "Time".length();
@@ -160,22 +162,26 @@ public class FinancialTracker {
         int totalLength = dateLength + timeLength + descriptionLength + vendorLength + 11 + 8; // 11 = amount column width, 8 = spaces between columns
         return new ColumnWidth(dateLength,timeLength,descriptionLength,vendorLength,totalLength);
     }
-    private static void columnSetUp(ColumnWidth width){
+
+    private static void printHeader(ColumnWidth width){
         System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10s%n", "Date", "Time", "Description", "Vendor", "Amount");
         System.out.println("=".repeat(width.total));
     }
+
     private static void printRow(Transaction t, ColumnWidth width){
         System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate().format(DATE_FMT), t.getTime().format(TIME_FMT), t.getDescription(), t.getVendor(), t.getAmount());
     }
+
     private static void displayLedger(ColumnWidth width) {
-        columnSetUp(width);
+        printHeader(width);
         for (Transaction t : transactions) {
             printRow(t, width);
         }
         System.out.println("\n");
     }
+
     private static void displayDeposits(ColumnWidth width) {
-        columnSetUp(width);
+        printHeader(width);
         for (Transaction t: transactions){
             if (t.getAmount() > 0){
                 printRow(t, width);
@@ -183,8 +189,9 @@ public class FinancialTracker {
         }
         System.out.println("\n");
     }
+
     private static void displayPayments(ColumnWidth width){
-        columnSetUp(width);
+        printHeader(width);
         for(Transaction t: transactions){
             if (t.getAmount() < 0) {
                 printRow(t, width);
@@ -192,7 +199,8 @@ public class FinancialTracker {
         }
         System.out.println("\n");
     }
-    private static void reportsMenu(Scanner scanner, ColumnWidth width) {
+
+    private static void reportsMenu(Scanner scanner) {
         boolean running = true;
         while (running) {
             System.out.println("Reports");
@@ -236,12 +244,13 @@ public class FinancialTracker {
                     String vendor = scanner.nextLine();
                     filterTransactionsByVendor(vendor, columnWidths());
                 }
-                case "6" -> customSearch(scanner);
+                case "6" -> customSearch(scanner,columnWidths());
                 case "0" -> running = false;
                 default -> System.out.println("Invalid option");
             }
         }
     }
+
     private static void filterTransactionsByDate(LocalDate start, LocalDate end, ColumnWidth width) {
         boolean hasSomething = false;
         for (Transaction t: transactions) {
@@ -256,6 +265,7 @@ public class FinancialTracker {
             System.out.println("No transactions found");
         }
     }
+
     private static void filterTransactionsByVendor(String vendor, ColumnWidth width) {
         boolean hasSomething = false;
 
@@ -269,7 +279,8 @@ public class FinancialTracker {
             System.out.println("No transactions with this vendor");
         }
     }
-    private static void customSearch(Scanner scanner) {
+
+    private static void customSearch(Scanner scanner, ColumnWidth width) {
         System.out.println("Please enter the information below");
         System.out.print("Start Date(yyyy-MM-dd): ");
         LocalDate startDate = parseDate(scanner.nextLine());
@@ -287,18 +298,21 @@ public class FinancialTracker {
         String amountString = scanner.nextLine();
         Double amount = parseDouble(amountString);
 
-        if (startDate == null) {
-            startDate = parseDate("0001-01-01");
-        }
-        if (endDate == null) {
-            endDate = parseDate("9999-12-31");
-        }
+        startDate = (startDate == null) ? LocalDate.MIN : startDate;
+        endDate = (endDate == null) ? LocalDate.MAX : endDate;
+
         boolean found = false;
-        columnSetUp(columnWidths());
+        printHeader(width);
         for (Transaction t : transactions) {
             LocalDate date = t.getDate();
-            if (!date.isBefore(startDate) && !date.isAfter(endDate) && (description.isEmpty() || description.equalsIgnoreCase(t.getDescription())) && (vendor.isEmpty() || vendor.equalsIgnoreCase(t.getVendor())) && (amount == null || amount == t.getAmount())) {
-                printRow(t, columnWidths());
+
+            boolean matchesDescription = (description.isEmpty() || description.equalsIgnoreCase(t.getDescription()));
+            boolean matchesVendor = (vendor.isEmpty() || vendor.equalsIgnoreCase(t.getVendor()));
+            boolean matchesAmount = (amount == null || amount == t.getAmount());
+            boolean matchesDate = !date.isBefore(startDate) && !date.isAfter(endDate);
+
+            if (matchesDate && matchesDescription && matchesVendor && matchesAmount) {
+                printRow(t, width);
                 found = true;
             }
         }
@@ -306,6 +320,7 @@ public class FinancialTracker {
             System.out.println("No transactions found");
         }
     }
+
     private static LocalDate parseDate(String s) {
         try{
             return LocalDate.parse(s);
