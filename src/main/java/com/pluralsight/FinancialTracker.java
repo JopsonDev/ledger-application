@@ -23,9 +23,6 @@ public class FinancialTracker {
 
     public static void main(String[] args) {
         loadTransactions(FILE_NAME, transactions);
-
-        sorted();
-
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
 
@@ -104,44 +101,36 @@ public class FinancialTracker {
             } else { break;
             }
         }
-
-        return new Transaction(date, time, description, vendor, amount);
+        Transaction object = new Transaction(date, time, description, vendor, amount);
+        transactions.add(object);
+        return object;
     }
 
     private static void addDeposit(Scanner scanner) {
         Transaction newDeposit = getTransactionInfo(scanner);
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, true));
-            writer.write(newDeposit + "\n");
-
-            System.out.println("Deposit Added");
-            sorted();
-
-            writer.close();
-        } catch (Exception c) {
-            System.out.println("failed to write");
-        }
+        addAmount(newDeposit);
     }
 
     private static void addPayment(Scanner scanner) {
         Transaction newPayment = getTransactionInfo(scanner);
         newPayment.setAmount(newPayment.getAmount() * -1);
-
+        addAmount(newPayment);
+    }
+    private static void addAmount(Transaction newAmount){
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, true));
-            writer.write(newPayment + "\n");
+            writer.write(newAmount + "\n");
 
-            System.out.println("Payment added");
-            sorted();
+            System.out.println(newAmount.getAmount() + " added");
 
             writer.close();
         }catch (Exception c) {
             System.out.println("failed to write");
         }
     }
-
     private static void ledgerMenu(Scanner scanner) {
         boolean running = true;
+        sorted();
         while (running) {
             System.out.println("Ledger");
             System.out.println("Choose an option:");
@@ -236,30 +225,27 @@ public class FinancialTracker {
             System.out.println("0) Back");
 
             String input = scanner.nextLine().trim();
+            LocalDate today = LocalDate.now();
 
             switch (input) {
                 case "1" -> {
-                    LocalDate today = LocalDate.now();
                     LocalDate startOfMonth = today.withDayOfMonth(1);
 
                     filterTransactionsByDate(startOfMonth, today, columnWidths());
                 }
                 case "2" -> {
-                    LocalDate today = LocalDate.now();
                     LocalDate previousMonth = today.withDayOfMonth(1).minusMonths(1);
                     LocalDate endOfPreviousMonth = today.withDayOfMonth(1).minusDays(1);
 
                     filterTransactionsByDate(previousMonth, endOfPreviousMonth, columnWidths());
                 }
                 case "3" -> {
-                    LocalDate today = LocalDate.now();
                     LocalDate yearStart = today.withDayOfYear(1);
                     LocalDate yearEnd = today.withDayOfYear(today.lengthOfYear());
 
                     filterTransactionsByDate(yearStart, yearEnd, columnWidths());
                 }
                 case "4" -> {
-                    LocalDate today = LocalDate.now();
                     LocalDate yearStart = today.withDayOfYear(1).minusYears(1);
                     LocalDate yearEnd = yearStart.withDayOfYear(yearStart.lengthOfYear());
 
@@ -293,6 +279,7 @@ public class FinancialTracker {
         }
     }
 
+
     private static void filterTransactionsByVendor(String vendor, ColumnWidth width) {
         boolean hasSomething = false;
 
@@ -325,20 +312,18 @@ public class FinancialTracker {
         String amountString = scanner.nextLine();
         Double amount = parseDouble(amountString);
 
-        startDate = (startDate == null) ? LocalDate.MIN : startDate;
-        endDate = (endDate == null) ? LocalDate.MAX : endDate;
-
         boolean found = false;
         printHeader(width);
         for (Transaction t : transactions) {
             LocalDate date = t.getDate();
 
+            boolean matchesStartDate = (startDate == null || !date.isBefore(startDate));
+            boolean matchesEndDate = (endDate == null || !date.isAfter(endDate));
             boolean matchesDescription = (description.isEmpty() || description.equalsIgnoreCase(t.getDescription()));
             boolean matchesVendor = (vendor.isEmpty() || vendor.equalsIgnoreCase(t.getVendor()));
             boolean matchesAmount = (amount == null || amount == t.getAmount());
-            boolean matchesDate = !date.isBefore(startDate) && !date.isAfter(endDate);
 
-            if (matchesDate && matchesDescription && matchesVendor && matchesAmount) {
+            if (matchesStartDate && matchesEndDate && matchesDescription && matchesVendor && matchesAmount) {
                 printRow(t, width);
                 found = true;
             }

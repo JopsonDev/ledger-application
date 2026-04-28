@@ -2,23 +2,26 @@
 
 ## Description of the Project
 
-Briefly describe what this Java console application does. Mention its purpose and who the intended users are. Explain the main functionality and what problems it aims to solve.
+Ledger application that allows the user to enter in and keep track of transactions done. Ranging from deposits to payments and save them to a file.
+Also allows the user to look at all the transactions made whether it's a custom search or through some display options included. 
+This aims to make day to day record keeping easier. 
 
 ## User Stories
 
-List the user stories that guided the development of your application. Format these stories as: "As a [type of user], I want [some goal] so that [some reason]."
-
-- As a user, I want to be able to input my data, so that the application can process it accordingly.
-- As a user, I want to receive immediate feedback, so I can understand what to do next.
+- As a user I want to see reports based on certain key phrases this will help when accessing reports in particular information that's needed.
+- As a user I want to be able to make a deposit that keeps track of the time, description, vendor, amount that way I can access the information later.
+- As a user I want to be able to see the ledger, deposits, and payments this way I can see the information enter in the section I need.
+- As a user I want to be able to add payments to the records with dates, times, amount, vendor, and description so that ill be able to access the information later.
 
 ## Setup
 
-Instructions on how to set up and run the project using IntelliJ IDEA.
+Gather and use code. Make sure to have a Transaction.csv file and run program. 
 
 ### Prerequisites
 
 - IntelliJ IDEA: Ensure you have IntelliJ IDEA installed, which you can download from [here](https://www.jetbrains.com/idea/download/).
 - Java SDK: Make sure Java SDK is installed and configured in IntelliJ.
+- Have a file "transactions.csv" to save information too
 
 ### Running the Application in IntelliJ
 
@@ -32,9 +35,8 @@ Follow these steps to get your application running within IntelliJ IDEA:
 
 ## Technologies Used
 
-- Java: Mention the version you are using.
-- Any additional libraries or frameworks used in the project.
-
+- Java: JDK "corretto-17" to Amazon Corretto 17.0.19
+- 
 ## Demo
 
 Include screenshots or GIFs that show your application in action. Use tools like [Giphy Capture](https://giphy.com/apps/giphycapture) to record a GIF of your application.
