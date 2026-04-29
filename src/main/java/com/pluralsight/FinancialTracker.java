@@ -10,19 +10,23 @@ import java.util.Scanner;
 
 public class FinancialTracker {
 
+    private static final String RESET = "\u001B[0m";
+    private static final String RED = "\u001B[31m";
+    private static final String GREEN = "\u001B[32m";
     private static final ArrayList<Transaction> transactions = new ArrayList<>();
     static {
         try {
             File file = new File("transactions.csv");
-            System.out.println("Checking for Transactions\n");
+            System.out.print("Checking for Transactions\n");
+            loadingBar(50);
             if(!file.exists()){
                 file.createNewFile();
-                System.out.println("New Transaction File created\n");
+                System.out.println(GREEN + "New Transaction File created" + RESET);
             } else {
-                System.out.println("Transactions found.\n");
+                System.out.println(GREEN + "Transactions found." + RESET);
             }
         } catch (Exception q){
-            System.out.println("Failed to write file");
+            System.out.print("Failed to write file");
         }
     }
     private static final String FILE_NAME = "transactions.csv";
@@ -36,12 +40,15 @@ public class FinancialTracker {
     private static final DateTimeFormatter DATETIME_FMT = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
 
     public static void main(String[] args) {
+        System.out.println("====================================================\nWelcome back!");
+        loadingBar(150);
         loadTransactions(FILE_NAME, transactions);
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
 
         while (running) {
-            System.out.println("Welcome to TransactionApp");
+            System.out.println("\nWelcome to TransactionApp");
+            System.out.println("=========================");
             System.out.println("Choose an option:");
             System.out.println("D) Add Deposit");
             System.out.println("P) Make Payment (Debit)");
@@ -88,7 +95,7 @@ public class FinancialTracker {
         while (true) {
             try {
                 System.out.print("Date and Time (yyyy-MM-dd HH:mm:ss): ");
-                String input = scanner.nextLine();
+                String input = scanner.nextLine().trim();
 
                 LocalDateTime dateTime = LocalDateTime.parse(input, DATETIME_FMT);
                 date = dateTime.toLocalDate();
@@ -100,14 +107,14 @@ public class FinancialTracker {
             }
         }
         System.out.print("Description: ");
-        String description = scanner.nextLine();
+        String description = scanner.nextLine().trim();
         System.out.print("Vendor: ");
-        String vendor = scanner.nextLine();
+        String vendor = scanner.nextLine().trim();
 
         Double amount;
         while (true) {
             System.out.print("Amount: ");
-            amount = parseDouble(scanner.nextLine());
+            amount = parseDouble(scanner.nextLine().trim());
 
 
             if ((amount == null || amount < 0)) {
@@ -130,23 +137,27 @@ public class FinancialTracker {
         newPayment.setAmount(newPayment.getAmount() * -1);
         addAmount(newPayment);
     }
+
     private static void addAmount(Transaction newAmount){
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, true));
             writer.write(newAmount + "\n");
 
-            System.out.println(newAmount.getAmount() + " added");
+            loadingBar(30);
+            System.out.println(newAmount.getAmount() + " has been added to records");
 
             writer.close();
         }catch (Exception c) {
             System.out.println("failed to write");
         }
     }
+
     private static void ledgerMenu(Scanner scanner) {
         boolean running = true;
         sorted();
         while (running) {
-            System.out.println("Ledger");
+            System.out.println("\n         Ledger");
+            System.out.println("=========================");
             System.out.println("Choose an option:");
             System.out.println("A) All");
             System.out.println("D) Deposits");
@@ -189,7 +200,11 @@ public class FinancialTracker {
     }
 
     private static void printRow(Transaction t, ColumnWidth width){
-        System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10.2f%n", t.getDate().format(DATE_FMT), t.getTime().format(TIME_FMT), t.getDescription(), t.getVendor(), t.getAmount());
+        if (t.getAmount() < 0) {
+            System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s " + GREEN + "$" + RESET + RED + "%10.2f%n" + RESET, t.getDate().format(DATE_FMT), t.getTime().format(TIME_FMT), t.getDescription(), t.getVendor(), t.getAmount());
+        } else {
+            System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s" + GREEN + " $%10.2f%n" + RESET, t.getDate().format(DATE_FMT), t.getTime().format(TIME_FMT), t.getDescription(), t.getVendor(), t.getAmount());
+        }
     }
 
     private static void sorted(){
@@ -197,6 +212,7 @@ public class FinancialTracker {
     }
 
     private static void displayLedger(ColumnWidth width) {
+        loadingBar(30);
         printHeader(width);
 
         for (Transaction t : transactions) {
@@ -206,6 +222,7 @@ public class FinancialTracker {
     }
 
     private static void displayDeposits(ColumnWidth width) {
+        loadingBar(30);
         printHeader(width);
         for (Transaction t: transactions){
             if (t.getAmount() > 0){
@@ -216,6 +233,7 @@ public class FinancialTracker {
     }
 
     private static void displayPayments(ColumnWidth width){
+        loadingBar(30);
         printHeader(width);
         for(Transaction t: transactions){
             if (t.getAmount() < 0) {
@@ -228,7 +246,8 @@ public class FinancialTracker {
     private static void reportsMenu(Scanner scanner) {
         boolean running = true;
         while (running) {
-            System.out.println("Reports");
+            System.out.println("         Reports");
+            System.out.println("=========================");
             System.out.println("Choose an option:");
             System.out.println("1) Month To Date");
             System.out.println("2) Previous Month");
@@ -280,6 +299,7 @@ public class FinancialTracker {
 
     private static void filterTransactionsByDate(LocalDate start, LocalDate end, ColumnWidth width) {
         boolean hasSomething = false;
+        loadingBar(30);
         printHeader(width);
         for (Transaction t: transactions) {
             LocalDate date = t.getDate();
@@ -295,9 +315,9 @@ public class FinancialTracker {
         System.out.println("\n");
     }
 
-
     private static void filterTransactionsByVendor(String vendor, ColumnWidth width) {
         boolean hasSomething = false;
+        loadingBar(30);
         printHeader(width);
         for(Transaction t: transactions){
             if(t.getVendor().equalsIgnoreCase(vendor)){
@@ -314,22 +334,23 @@ public class FinancialTracker {
     private static void customSearch(Scanner scanner, ColumnWidth width) {
         System.out.println("Please enter the information below, press enter to leave blank.");
         System.out.print("Start Date(yyyy-MM-dd): ");
-        LocalDate startDate = parseDate(scanner.nextLine());
+        LocalDate startDate = parseDate(scanner.nextLine().trim());
 
         System.out.print("End Date(yyyy-MM-dd): ");
-        LocalDate endDate = parseDate(scanner.nextLine());
+        LocalDate endDate = parseDate(scanner.nextLine().trim());
 
         System.out.print("Description: ");
-        String description = scanner.nextLine();
+        String description = scanner.nextLine().trim();
 
         System.out.print("Vendor: ");
-        String vendor = scanner.nextLine();
+        String vendor = scanner.nextLine().trim();
 
         System.out.print("Exact Amount: ");
-        String amountString = scanner.nextLine();
+        String amountString = scanner.nextLine().trim();
         Double amount = parseDouble(amountString);
 
         boolean found = false;
+        loadingBar(30);
         printHeader(width);
         for (Transaction t : transactions) {
             LocalDate date = t.getDate();
@@ -365,6 +386,22 @@ public class FinancialTracker {
        } catch (Exception z) {
            return null;
        }
+    }
+
+    private static void loadingBar(int x){
+        int length = 20;
+        for(int i = 0; i < length; i++) {
+            String bar = "[" + "-".repeat(i) + GREEN + "LOADING" + RESET + "-".repeat(length - i - 1) + "]";
+            System.out.print("\r" + bar);
+            if(i == 19){
+                System.out.println("\r" + " ");
+            }
+            try {
+                Thread.sleep(x);
+            } catch (Exception Menu) {
+                System.out.println("Critical Fail");
+            }
+        }
     }
 }
  
