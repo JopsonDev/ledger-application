@@ -17,12 +17,7 @@ public class Transaction {
         this.vendor = vendor;
         this.amount = amount;
     }
-
-    public void setDate(LocalDate date) {this.date = date;}
-    public void setDescription(String description) {this.description = description;}
     public void setAmount(double amount) {this.amount = amount;}
-    public void setTime(LocalTime time) {this.time = time;}
-    public void setVendor(String vendor) {this.vendor = vendor;}
 
     public LocalDate getDate() {return date;}
     public String getDescription() {return description;}

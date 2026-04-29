@@ -11,6 +11,20 @@ import java.util.Scanner;
 public class FinancialTracker {
 
     private static final ArrayList<Transaction> transactions = new ArrayList<>();
+    static {
+        try {
+            File file = new File("transactions.csv");
+            System.out.println("Checking for Transactions\n");
+            if(!file.exists()){
+                file.createNewFile();
+                System.out.println("New Transaction File created\n");
+            } else {
+                System.out.println("Transactions found.\n");
+            }
+        } catch (Exception q){
+            System.out.println("Failed to write file");
+        }
+    }
     private static final String FILE_NAME = "transactions.csv";
 
     private static final String DATE_PATTERN = "yyyy-MM-dd";
@@ -90,13 +104,13 @@ public class FinancialTracker {
         System.out.print("Vendor: ");
         String vendor = scanner.nextLine();
 
-        double amount;
+        Double amount;
         while (true) {
             System.out.print("Amount: ");
-            amount = scanner.nextDouble();
-            scanner.nextLine();
+            amount = parseDouble(scanner.nextLine());
 
-            if (amount < 0) {
+
+            if ((amount == null || amount < 0)) {
                 System.out.println("Amount needs to be a positive number.");
             } else { break;
             }
