@@ -15,7 +15,7 @@ This aims to make day to day record keeping easier.
 
 ## Setup
 
-Gather and use code. Make sure to have a Transaction.csv file and run program. 
+Gather and use code. Run from main class with the `public static void main(String[] args)`
 
 ### Prerequisites
 
@@ -36,36 +36,28 @@ Follow these steps to get your application running within IntelliJ IDEA:
 ## Technologies Used
 
 - Java: JDK "corretto-17" to Amazon Corretto 17.0.19
-- 
+
 ## Demo
 
 Include screenshots or GIFs that show your application in action. Use tools like [Giphy Capture](https://giphy.com/apps/giphycapture) to record a GIF of your application.
-
-![Application Screenshot](path/to/your/screenshot.png)
-
+![Seeing the Legder](../../../../Pictures/Screenshots/Screenshot%202026-04-29%20093349.png)
+![Custom searches](../../../../Pictures/Screenshots/Screenshot%202026-04-29%20093436.png)
 ## Future Work
 
-Outline potential future enhancements or functionalities you might consider adding:
-
-- Additional feature to be developed.
-- Improvement of current functionalities.
+- Keeping track of spending habits to better understand your money
+- Better user interface more personality 
 
 ## Resources
 
 List resources such as tutorials, articles, or documentation that helped you during the project.
 
-- [Java Programming Tutorial](https://www.example.com)
-- [Effective Java](https://www.example.com)
-
-## Team Members
-
-- **Name 1** - Specific contributions or roles.
-- **Name 2** - Specific contributions or roles.
+- [LocalDate shortcuts and information](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/class-use/LocalDate.html)
+- [Creating Files](https://www.w3schools.com/java/java_files_create.asp)
+- [Creating Columns](https://oneuptime.com/blog/post/2026-03-02-how-to-use-the-column-and-printf-commands-for-formatted-output-on-ubuntu/view)
 
 ## Thanks
 
 Express gratitude towards those who provided help, guidance, or resources:
 
-- Thank you to [Mentor's Name] for continuous support and guidance.
-- A special thanks to all teammates for their dedication and teamwork.
+- Thank you to all my testers who actively tried to break my program.
  
