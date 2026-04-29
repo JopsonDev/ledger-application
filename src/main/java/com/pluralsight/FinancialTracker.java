@@ -41,7 +41,7 @@ public class FinancialTracker {
 
     public static void main(String[] args) {
         System.out.println("====================================================\nWelcome back!");
-        loadingBar(150);
+        loadingBar(80);
         loadTransactions(FILE_NAME, transactions);
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
@@ -83,6 +83,7 @@ public class FinancialTracker {
                 Transaction object = new Transaction(date, time, description, vendor, amount);
                 transactions.add(object);
             }
+            reader.close();
         } catch (Exception a) {
             System.out.println("Error 1: couldn't load transactions.");
         }
@@ -274,9 +275,8 @@ public class FinancialTracker {
                 }
                 case "3" -> {
                     LocalDate yearStart = today.withDayOfYear(1);
-                    LocalDate yearEnd = today.withDayOfYear(today.lengthOfYear());
 
-                    filterTransactionsByDate(yearStart, yearEnd, columnWidths());
+                    filterTransactionsByDate(yearStart, today, columnWidths());
                 }
                 case "4" -> {
                     LocalDate yearStart = today.withDayOfYear(1).minusYears(1);
