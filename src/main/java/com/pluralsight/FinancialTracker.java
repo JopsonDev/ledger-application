@@ -193,7 +193,7 @@ public class FinancialTracker {
             descriptionLength = Math.max(descriptionLength, t.getDescription().length());
             vendorLength = Math.max(vendorLength, t.getVendor().length());
         }
-        int totalLength = dateLength + timeLength + descriptionLength + vendorLength + 11 + 8; // 11 = amount column width, 8 = spaces between columns
+        int totalLength = dateLength + timeLength + descriptionLength + vendorLength + 9 + 8; // 9 = amount column width, 8 = spaces between columns
         return new ColumnWidth(dateLength, timeLength, descriptionLength, vendorLength, totalLength);
     }
 
@@ -204,9 +204,9 @@ public class FinancialTracker {
 
     private static void printRow(Transaction t, ColumnWidth width) {
         if (t.getAmount() < 0) {
-            System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s " + GREEN + "$" + RESET + RED + "%10.2f%n" + RESET, t.getDate().format(DATE_FMT), t.getTime().format(TIME_FMT), t.getDescription(), t.getVendor(), t.getAmount());
+            System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s " + GREEN + "$" + RESET + RED + "%,10.2f%n" + RESET, t.getDate().format(DATE_FMT), t.getTime().format(TIME_FMT), t.getDescription(), t.getVendor(), t.getAmount());
         } else {
-            System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s" + GREEN + " $%10.2f%n" + RESET, t.getDate().format(DATE_FMT), t.getTime().format(TIME_FMT), t.getDescription(), t.getVendor(), t.getAmount());
+            System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s" + GREEN + " $%,10.2f%n" + RESET, t.getDate().format(DATE_FMT), t.getTime().format(TIME_FMT), t.getDescription(), t.getVendor(), t.getAmount());
         }
     }
 
