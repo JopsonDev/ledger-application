@@ -88,8 +88,7 @@ public class FinancialTracker {
                 transactions.add(object);
             }
             reader.close();
-        } catch (Exception a) {
-            System.out.println("Error 1: couldn't load transactions.");
+        } catch (Exception ignore) {
         }
     }
 
