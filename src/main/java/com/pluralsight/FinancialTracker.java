@@ -158,7 +158,7 @@ public class FinancialTracker {
 
     private static void ledgerMenu(Scanner scanner) {
         boolean running = true;
-        //sorted();
+        sorted();
         while (running) {
             System.out.println("\n         Ledger");
             System.out.println("=========================");
@@ -211,9 +211,9 @@ public class FinancialTracker {
         }
     }
 
-    //private static void sorted() {
-        //transactions.sort((t1, t2) -> LocalDateTime.of(t2.getDate(), t2.getTime()).compareTo(LocalDateTime.of(t1.getDate(), t1.getTime())));
-    //}
+    private static void sorted() {
+        transactions.sort((t1, t2) -> LocalDateTime.of(t2.getDate(), t2.getTime()).compareTo(LocalDateTime.of(t1.getDate(), t1.getTime())));
+    }
 
     private static void displayLedger(ColumnWidth width) {
         loadingBar(30);
@@ -389,8 +389,7 @@ public class FinancialTracker {
             } else {
                 try {
                     date = LocalDate.parse(dateString);
-                } catch (Exception e) {
-                    date = null;
+                } catch (Exception ignored) {
                 }
                 if (date != null) {
                     isDone = true;
@@ -412,8 +411,7 @@ public class FinancialTracker {
             } else {
                 try {
                     amount = Double.parseDouble(amountString);
-                } catch (Exception e) {
-                    amount = null;
+                } catch (Exception ignored) {
                 }
                 if (amount != null) {
                     isDone = true;
