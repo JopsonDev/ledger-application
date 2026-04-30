@@ -14,21 +14,23 @@ public class FinancialTracker {
     private static final String RED = "\u001B[31m";
     private static final String GREEN = "\u001B[32m";
     private static final ArrayList<Transaction> transactions = new ArrayList<>();
+
     static {
         try {
             File file = new File("transactions.csv");
             System.out.print("Checking for Transactions\n");
             loadingBar(50);
-            if(!file.exists()){
+            if (!file.exists()) {
                 file.createNewFile();
                 System.out.println(GREEN + "New Transaction File created" + RESET);
             } else {
                 System.out.println(GREEN + "Transactions found." + RESET);
             }
-        } catch (Exception q){
+        } catch (Exception q) {
             System.out.print("Failed to write file");
         }
     }
+
     private static final String FILE_NAME = "transactions.csv";
 
     private static final String DATE_PATTERN = "yyyy-MM-dd";
@@ -67,6 +69,7 @@ public class FinancialTracker {
         }
         scanner.close();
     }
+
     public static void loadTransactions(String fileName, ArrayList<Transaction> transactions) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(fileName));
@@ -89,7 +92,7 @@ public class FinancialTracker {
         }
     }
 
-    private static Transaction getTransactionInfo(Scanner scanner){
+    private static Transaction getTransactionInfo(Scanner scanner) {
         LocalDate date;
         LocalTime time;
 
@@ -114,13 +117,12 @@ public class FinancialTracker {
 
         Double amount;
         while (true) {
-            System.out.print("Amount: ");
-            amount = parseDouble(scanner.nextLine().trim());
-
+            amount = parseDouble(scanner);
 
             if ((amount == null || amount < 0)) {
                 System.out.println("Amount needs to be a positive number.");
-            } else { break;
+            } else {
+                break;
             }
         }
         Transaction object = new Transaction(date, time, description, vendor, amount);
@@ -139,7 +141,7 @@ public class FinancialTracker {
         addAmount(newPayment);
     }
 
-    private static void addAmount(Transaction newAmount){
+    private static void addAmount(Transaction newAmount) {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, true));
             writer.write(newAmount + "\n");
@@ -148,7 +150,7 @@ public class FinancialTracker {
             System.out.println(newAmount.getAmount() + " has been added to records");
 
             writer.close();
-        }catch (Exception c) {
+        } catch (Exception c) {
             System.out.println("failed to write");
         }
     }
@@ -179,28 +181,28 @@ public class FinancialTracker {
         }
     }
 
-    private static ColumnWidth columnWidths(){
+    private static ColumnWidth columnWidths() {
         int dateLength = "Date".length();
         int timeLength = "Time".length();
         int descriptionLength = "Description".length();
         int vendorLength = "Vendor".length();
 
-        for (Transaction t : transactions){
+        for (Transaction t : transactions) {
             dateLength = Math.max(dateLength, t.getDate().toString().length());
             timeLength = Math.max(timeLength, t.getTime().toString().length());
             descriptionLength = Math.max(descriptionLength, t.getDescription().length());
             vendorLength = Math.max(vendorLength, t.getVendor().length());
         }
         int totalLength = dateLength + timeLength + descriptionLength + vendorLength + 11 + 8; // 11 = amount column width, 8 = spaces between columns
-        return new ColumnWidth(dateLength,timeLength,descriptionLength,vendorLength,totalLength);
+        return new ColumnWidth(dateLength, timeLength, descriptionLength, vendorLength, totalLength);
     }
 
-    private static void printHeader(ColumnWidth width){
+    private static void printHeader(ColumnWidth width) {
         System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10s%n", "Date", "Time", "Description", "Vendor", "Amount");
         System.out.println("=".repeat(width.total));
     }
 
-    private static void printRow(Transaction t, ColumnWidth width){
+    private static void printRow(Transaction t, ColumnWidth width) {
         if (t.getAmount() < 0) {
             System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s " + GREEN + "$" + RESET + RED + "%10.2f%n" + RESET, t.getDate().format(DATE_FMT), t.getTime().format(TIME_FMT), t.getDescription(), t.getVendor(), t.getAmount());
         } else {
@@ -208,7 +210,7 @@ public class FinancialTracker {
         }
     }
 
-    private static void sorted(){
+    private static void sorted() {
         transactions.sort((t1, t2) -> LocalDateTime.of(t2.getDate(), t2.getTime()).compareTo(LocalDateTime.of(t1.getDate(), t1.getTime())));
     }
 
@@ -225,18 +227,18 @@ public class FinancialTracker {
     private static void displayDeposits(ColumnWidth width) {
         loadingBar(30);
         printHeader(width);
-        for (Transaction t: transactions){
-            if (t.getAmount() > 0){
+        for (Transaction t : transactions) {
+            if (t.getAmount() > 0) {
                 printRow(t, width);
             }
         }
         System.out.println("\n");
     }
 
-    private static void displayPayments(ColumnWidth width){
+    private static void displayPayments(ColumnWidth width) {
         loadingBar(30);
         printHeader(width);
-        for(Transaction t: transactions){
+        for (Transaction t : transactions) {
             if (t.getAmount() < 0) {
                 printRow(t, width);
             }
@@ -290,7 +292,7 @@ public class FinancialTracker {
 
                     filterTransactionsByVendor(vendor, columnWidths());
                 }
-                case "6" -> customSearch(scanner,columnWidths());
+                case "6" -> customSearch(scanner, columnWidths());
                 case "0" -> running = false;
                 default -> System.out.println("Invalid option");
             }
@@ -301,7 +303,7 @@ public class FinancialTracker {
         boolean hasSomething = false;
         loadingBar(30);
         printHeader(width);
-        for (Transaction t: transactions) {
+        for (Transaction t : transactions) {
             LocalDate date = t.getDate();
 
             if (!date.isBefore(start) && !date.isAfter(end)) {
@@ -309,7 +311,7 @@ public class FinancialTracker {
                 hasSomething = true;
             }
         }
-        if (!hasSomething){
+        if (!hasSomething) {
             System.out.println("No transactions found");
         }
         System.out.println("\n");
@@ -319,13 +321,13 @@ public class FinancialTracker {
         boolean hasSomething = false;
         loadingBar(30);
         printHeader(width);
-        for(Transaction t: transactions){
-            if(t.getVendor().equalsIgnoreCase(vendor)){
+        for (Transaction t : transactions) {
+            if (t.getVendor().equalsIgnoreCase(vendor)) {
                 printRow(t, width);
                 hasSomething = true;
             }
         }
-        if (!hasSomething){
+        if (!hasSomething) {
             System.out.println("No transactions with this vendor");
         }
         System.out.println("\n");
@@ -333,11 +335,12 @@ public class FinancialTracker {
 
     private static void customSearch(Scanner scanner, ColumnWidth width) {
         System.out.println("Please enter the information below, press enter to leave blank.");
-        System.out.print("Start Date(yyyy-MM-dd): ");
-        LocalDate startDate = parseDate(scanner.nextLine().trim());
+        System.out.print("Start Date ");
+        LocalDate startDate = parseDate(scanner);
 
-        System.out.print("End Date(yyyy-MM-dd): ");
-        LocalDate endDate = parseDate(scanner.nextLine().trim());
+        System.out.print("End Date ");
+        LocalDate endDate = parseDate(scanner);
+
 
         System.out.print("Description: ");
         String description = scanner.nextLine().trim();
@@ -345,9 +348,8 @@ public class FinancialTracker {
         System.out.print("Vendor: ");
         String vendor = scanner.nextLine().trim();
 
-        System.out.print("Exact Amount: ");
-        String amountString = scanner.nextLine().trim();
-        Double amount = parseDouble(amountString);
+        Double amount = parseDouble(scanner);
+
 
         boolean found = false;
         loadingBar(30);
@@ -366,34 +368,64 @@ public class FinancialTracker {
                 found = true;
             }
         }
-        if(!found){
+        if (!found) {
             System.out.println("No transactions found");
         }
         System.out.println("\n");
     }
 
-    private static LocalDate parseDate(String s) { // need to add fail message
-        try{
-            return LocalDate.parse(s);
-        }catch(Exception y) {
-            return null;
+    private static LocalDate parseDate(Scanner scanner) { // need to add fail message
+        String dateString;
+        LocalDate date = null;
+        boolean isDone = false;
+        while (!isDone) {
+            System.out.print("Input Date Use yyyy-MM-dd: ");
+            dateString = scanner.nextLine().trim();
+            if (dateString.isEmpty()) {
+                isDone = true;
+            } else {
+                try {
+                    date = LocalDate.parse(dateString);
+                } catch (Exception e) {
+                    date = null;
+                }
+                if (date != null) {
+                    isDone = true;
+                }
+            }
         }
+        return date;
     }
 
-    private static Double parseDouble(String s) { // need to add fail message
-       try{
-           return Double.parseDouble(s);
-       } catch (Exception z) {
-           return null;
-       }
+    private static Double parseDouble(Scanner scanner) {// need to add fail message
+        String amountString;
+        Double amount = null;
+        boolean isDone = false;
+        while (!isDone) {
+            System.out.print("Exact Amount: ");
+            amountString = scanner.nextLine().trim();
+            if (amountString.isEmpty()) {
+                isDone = true;
+            } else {
+                try {
+                    amount = Double.parseDouble(amountString);
+                } catch (Exception e) {
+                    amount = null;
+                }
+                if (amount != null) {
+                    isDone = true;
+                }
+            }
+        }
+        return amount;
     }
 
-    private static void loadingBar(int x){
+    private static void loadingBar(int x) {
         int length = 20;
-        for(int i = 0; i < length; i++) {
+        for (int i = 0; i < length; i++) {
             String bar = "[" + "-".repeat(i) + GREEN + "LOADING" + RESET + "-".repeat(length - i - 1) + "]";
             System.out.print("\r" + bar);
-            if(i == 19){
+            if (i == 19) {
                 System.out.println("\r" + " ");
             }
             try {
@@ -404,4 +436,6 @@ public class FinancialTracker {
         }
     }
 }
+
+
  
