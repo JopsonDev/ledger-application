@@ -30,6 +30,7 @@ public class FinancialTracker {
         } catch (Exception q) {
             System.out.print("Failed to write file");
         }
+        System.out.println("====================================================");
     }
 
     private static final String FILE_NAME = "transactions.csv";
@@ -43,8 +44,7 @@ public class FinancialTracker {
     private static final DateTimeFormatter DATETIME_FMT = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
 
     public static void main(String[] args) {
-        System.out.println("====================================================\nWelcome back!");
-        loadingBar(80);
+        mainMenu();
         loadTransactions(FILE_NAME, transactions);
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
@@ -473,6 +473,31 @@ public class FinancialTracker {
             }
             System.out.printf("Current report balance: $%,.2f%n%n", amount);
         }
+    }
+
+    private static void mainMenu(){
+        System.out.println(" ______  __                                     \n" +
+                        "/\\__  _\\/\\ \\                                    \n" +
+                        "\\/_/\\ \\/\\ \\ \\___      __                        \n" +
+                        "   \\ \\ \\ \\ \\  _ `\\  /'__`\\                      \n" +
+                        "    \\ \\ \\ \\ \\ \\ \\ \\/\\  __/                      \n" +
+                        "     \\ \\_\\ \\ \\_\\ \\_\\ \\____\\                     \n" +
+                        "      \\/_/  \\/_/\\/_/\\/____/   ");
+
+        System.out.println(" __                 __                          \n" +
+                "/\\ \\               /\\ \\                         \n" +
+                "\\ \\ \\         __   \\_\\ \\     __      __   _ __  \n" +
+                " \\ \\ \\  __  /'__`\\ /'_` \\  /'_ `\\  /'__`\\/\\`'__\\\n" +
+                "  \\ \\ \\L\\ \\/\\  __//\\ \\L\\ \\/\\ \\L\\ \\/\\  __/\\ \\ \\/ \n" +
+                "   \\ \\____/\\ \\____\\ \\___,_\\ \\____ \\ \\____\\\\ \\_\\ \n" +
+                "    \\/___/  \\/____/\\/__,_ /\\/___L\\ \\/____/ \\/_/ \n" +
+                "                             /\\____/            \n" +
+                "                             \\_/__/             ");
+        System.out.println("====================================================");
+        loadingBar(80);
+        System.out.println("Welcome back!");
+
+
     }
 }
 
