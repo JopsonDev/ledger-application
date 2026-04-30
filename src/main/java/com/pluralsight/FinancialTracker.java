@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Scanner;
 
 public class FinancialTracker {
@@ -157,7 +158,7 @@ public class FinancialTracker {
 
     private static void ledgerMenu(Scanner scanner) {
         boolean running = true;
-        sorted();
+        //sorted();
         while (running) {
             System.out.println("\n         Ledger");
             System.out.println("=========================");
@@ -210,9 +211,9 @@ public class FinancialTracker {
         }
     }
 
-    private static void sorted() {
-        transactions.sort((t1, t2) -> LocalDateTime.of(t2.getDate(), t2.getTime()).compareTo(LocalDateTime.of(t1.getDate(), t1.getTime())));
-    }
+    //private static void sorted() {
+        //transactions.sort((t1, t2) -> LocalDateTime.of(t2.getDate(), t2.getTime()).compareTo(LocalDateTime.of(t1.getDate(), t1.getTime())));
+    //}
 
     private static void displayLedger(ColumnWidth width) {
         loadingBar(30);
@@ -258,6 +259,7 @@ public class FinancialTracker {
             System.out.println("4) Previous Year");
             System.out.println("5) Search by Vendor");
             System.out.println("6) Custom Search");
+            System.out.println("7) Current Ledger Balance");
             System.out.println("0) Back");
 
             String input = scanner.nextLine().trim();
@@ -293,6 +295,7 @@ public class FinancialTracker {
                     filterTransactionsByVendor(vendor, columnWidths());
                 }
                 case "6" -> customSearch(scanner, columnWidths());
+                case "7" -> totaling(scanner);
                 case "0" -> running = false;
                 default -> System.out.println("Invalid option");
             }
@@ -433,6 +436,45 @@ public class FinancialTracker {
             } catch (Exception Menu) {
                 System.out.println("Critical Fail");
             }
+        }
+    }
+
+    private static void totaling(Scanner scanner) {
+        boolean isDone = false;
+        while(!isDone) {
+            System.out.println(" Current Balance Reports");
+            System.out.println("=========================");
+            System.out.println("Choose an option:");
+            System.out.println("P) Payment Total Dollar Amount");
+            System.out.println("D) Deposit Total Dollar Amount");
+            System.out.println("A) Current total");
+            System.out.println("B) Go Back");
+            String input = scanner.nextLine();
+            double amount = 0;
+            switch (input.toUpperCase()) {
+                case "P" -> {
+                    for (Transaction t : transactions) {
+                        if (t.getAmount() < 0) {
+                            amount += t.getAmount();
+                        }
+                    }
+                }
+                case "D" -> {
+                    for (Transaction t : transactions) {
+                        if (t.getAmount() > 0) {
+                            amount += t.getAmount();
+                        }
+                    }
+                }
+                case "A" -> {
+                    for (Transaction t : transactions) {
+                        amount += t.getAmount();
+                    }
+                }
+                case "B" -> isDone = true;
+                default -> System.out.println("Invaild input");
+            }
+            System.out.printf("Current report balance: $%,.2f%n%n", amount);
         }
     }
 }
