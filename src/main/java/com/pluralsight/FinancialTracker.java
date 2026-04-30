@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Locale;
 import java.util.Scanner;
 
 public class FinancialTracker {
@@ -16,6 +15,7 @@ public class FinancialTracker {
     private static final String GREEN = "\u001B[32m";
     private static final ArrayList<Transaction> transactions = new ArrayList<>();
 
+    //Checks to see if there's a transaction file, if not makes one before the main application runs
     static {
         try {
             File file = new File("transactions.csv");
@@ -44,7 +44,7 @@ public class FinancialTracker {
     private static final DateTimeFormatter DATETIME_FMT = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
 
     public static void main(String[] args) {
-        mainMenu();
+        mainMenuDisplay();
         loadTransactions(FILE_NAME, transactions);
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
@@ -70,7 +70,7 @@ public class FinancialTracker {
         }
         scanner.close();
     }
-
+    // Checks transactions file and adds any to transactions array
     public static void loadTransactions(String fileName, ArrayList<Transaction> transactions) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(fileName));
@@ -92,6 +92,7 @@ public class FinancialTracker {
         }
     }
 
+    //gathers info from user to build transactions and adds object
     private static Transaction getTransactionInfo(Scanner scanner) {
         LocalDate date;
         LocalTime time;
@@ -130,17 +131,20 @@ public class FinancialTracker {
         return object;
     }
 
+    //add transaction as a deposit to the transaction file
     private static void addDeposit(Scanner scanner) {
         Transaction newDeposit = getTransactionInfo(scanner);
         addAmount(newDeposit);
     }
 
+    //adjust amount to appear as a negative and adds to transaction file
     private static void addPayment(Scanner scanner) {
         Transaction newPayment = getTransactionInfo(scanner);
         newPayment.setAmount(newPayment.getAmount() * -1);
         addAmount(newPayment);
     }
 
+    //method responsible for adding transactions to the file
     private static void addAmount(Transaction newAmount) {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, true));
@@ -154,7 +158,7 @@ public class FinancialTracker {
             System.out.println("failed to write");
         }
     }
-
+    //Menu display for ledger
     private static void ledgerMenu(Scanner scanner) {
         boolean running = true;
         sorted();
@@ -181,6 +185,7 @@ public class FinancialTracker {
         }
     }
 
+    //Sets column lengths for how transactions will appear to user
     private static ColumnWidth columnWidths() {
         int dateLength = "Date".length();
         int timeLength = "Time".length();
@@ -197,11 +202,13 @@ public class FinancialTracker {
         return new ColumnWidth(dateLength, timeLength, descriptionLength, vendorLength, totalLength);
     }
 
+    //handles displaying a print before reports print
     private static void printHeader(ColumnWidth width) {
         System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s $%10s%n", "Date", "Time", "Description", "Vendor", "Amount");
         System.out.println("=".repeat(width.total));
     }
 
+    //responsible for the format of how the transactions get show to the user
     private static void printRow(Transaction t, ColumnWidth width) {
         if (t.getAmount() < 0) {
             System.out.printf("%-" + width.date + "s %-" + width.time + "s %-" + width.description + "s %-" + width.vendor + "s " + GREEN + "$" + RESET + RED + "%,10.2f%n" + RESET, t.getDate().format(DATE_FMT), t.getTime().format(TIME_FMT), t.getDescription(), t.getVendor(), t.getAmount());
@@ -210,10 +217,12 @@ public class FinancialTracker {
         }
     }
 
+    //sorts the transactions from newest to oldest
     private static void sorted() {
         transactions.sort((t1, t2) -> LocalDateTime.of(t2.getDate(), t2.getTime()).compareTo(LocalDateTime.of(t1.getDate(), t1.getTime())));
     }
 
+    //shows all transactions
     private static void displayLedger(ColumnWidth width) {
         loadingBar(30);
         printHeader(width);
@@ -224,6 +233,7 @@ public class FinancialTracker {
         System.out.println("\n");
     }
 
+    //shows only deposits
     private static void displayDeposits(ColumnWidth width) {
         loadingBar(30);
         printHeader(width);
@@ -235,6 +245,7 @@ public class FinancialTracker {
         System.out.println("\n");
     }
 
+    //shows only payments
     private static void displayPayments(ColumnWidth width) {
         loadingBar(30);
         printHeader(width);
@@ -246,6 +257,8 @@ public class FinancialTracker {
         System.out.println("\n");
     }
 
+    //report menu with different options for user to choose from
+    //has a switch case based on user response
     private static void reportsMenu(Scanner scanner) {
         boolean running = true;
         while (running) {
@@ -301,6 +314,7 @@ public class FinancialTracker {
         }
     }
 
+    //checks if transaction dates are not before and not after the start and end date
     private static void filterTransactionsByDate(LocalDate start, LocalDate end, ColumnWidth width) {
         boolean hasSomething = false;
         loadingBar(30);
@@ -335,6 +349,7 @@ public class FinancialTracker {
         System.out.println("\n");
     }
 
+    //allows the user to do a custom search with whatever paramiters they'd like or not like
     private static void customSearch(Scanner scanner, ColumnWidth width) {
         System.out.println("Please enter the information below, press enter to leave blank.");
         System.out.print("Start Date ");
@@ -376,6 +391,7 @@ public class FinancialTracker {
         System.out.println("\n");
     }
 
+    //checks user input to convert a string into LocalDate or null and loops if user puts invalid input
     private static LocalDate parseDate(Scanner scanner) { // need to add fail message
         String dateString;
         LocalDate date = null;
@@ -398,6 +414,7 @@ public class FinancialTracker {
         return date;
     }
 
+    // //checks user input to convert a string into double or null and loops if user puts invalid input
     private static Double parseDouble(Scanner scanner) {// need to add fail message
         String amountString;
         Double amount = null;
@@ -420,6 +437,7 @@ public class FinancialTracker {
         return amount;
     }
 
+    //adds a cosmetic loading bar
     private static void loadingBar(int x) {
         int length = 20;
         for (int i = 0; i < length; i++) {
@@ -436,6 +454,7 @@ public class FinancialTracker {
         }
     }
 
+    //totals values based on user selection
     private static void totaling(Scanner scanner) {
         boolean isDone = false;
         while(!isDone) {
@@ -475,24 +494,27 @@ public class FinancialTracker {
         }
     }
 
-    private static void mainMenu(){
-        System.out.println(" ______  __                                     \n" +
-                        "/\\__  _\\/\\ \\                                    \n" +
-                        "\\/_/\\ \\/\\ \\ \\___      __                        \n" +
-                        "   \\ \\ \\ \\ \\  _ `\\  /'__`\\                      \n" +
-                        "    \\ \\ \\ \\ \\ \\ \\ \\/\\  __/                      \n" +
-                        "     \\ \\_\\ \\ \\_\\ \\_\\ \\____\\                     \n" +
-                        "      \\/_/  \\/_/\\/_/\\/____/   ");
+    //adds a cosmetic logo screen
+    private static void mainMenuDisplay(){
+        System.out.println("""
+                 ______  __                                    \s
+                /\\__  _\\/\\ \\                                   \s
+                \\/_/\\ \\/\\ \\ \\___      __                       \s
+                   \\ \\ \\ \\ \\  _ `\\  /'__`\\                     \s
+                    \\ \\ \\ \\ \\ \\ \\ \\/\\  __/                     \s
+                     \\ \\_\\ \\ \\_\\ \\_\\ \\____\\                    \s
+                      \\/_/  \\/_/\\/_/\\/____/  \s""");
 
-        System.out.println(" __                 __                          \n" +
-                "/\\ \\               /\\ \\                         \n" +
-                "\\ \\ \\         __   \\_\\ \\     __      __   _ __  \n" +
-                " \\ \\ \\  __  /'__`\\ /'_` \\  /'_ `\\  /'__`\\/\\`'__\\\n" +
-                "  \\ \\ \\L\\ \\/\\  __//\\ \\L\\ \\/\\ \\L\\ \\/\\  __/\\ \\ \\/ \n" +
-                "   \\ \\____/\\ \\____\\ \\___,_\\ \\____ \\ \\____\\\\ \\_\\ \n" +
-                "    \\/___/  \\/____/\\/__,_ /\\/___L\\ \\/____/ \\/_/ \n" +
-                "                             /\\____/            \n" +
-                "                             \\_/__/             ");
+        System.out.println("""
+                 __                 __                         \s
+                /\\ \\               /\\ \\                        \s
+                \\ \\ \\         __   \\_\\ \\     __      __   _ __ \s
+                 \\ \\ \\  __  /'__`\\ /'_` \\  /'_ `\\  /'__`\\/\\`'__\\
+                  \\ \\ \\L\\ \\/\\  __//\\ \\L\\ \\/\\ \\L\\ \\/\\  __/\\ \\ \\/\s
+                   \\ \\____/\\ \\____\\ \\___,_\\ \\____ \\ \\____\\\\ \\_\\\s
+                    \\/___/  \\/____/\\/__,_ /\\/___L\\ \\/____/ \\/_/\s
+                                             /\\____/           \s
+                                             \\_/__/            \s""");
         System.out.println("====================================================");
         loadingBar(80);
         System.out.println("Welcome back!");
